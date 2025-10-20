@@ -69,15 +69,15 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <form>
         <DialogTrigger asChild>
-          <Button className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]">
+          <Button className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
             Set reminder
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[425px] border-black bg-[#292929] text-[#f0f0f0]">
+        <DialogContent className="sm:max-w-[425px] border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
           <DialogHeader>
             <DialogTitle>Set reminder</DialogTitle>
-            <DialogDescription className="text-[#f0f0f0]">
+            <DialogDescription className="text-[var(--color-text-primary)]">
               {selectedTime && selectedTime !== "00:00"
                 ? `The timer is set to ${selectedTime}`
                 : "Timer is not set"}
@@ -86,7 +86,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
 
           <Label htmlFor="time-picker">Time</Label>
           <Input
-            className="w-30 bg-[#545454] appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+            className="w-30 bg-[var(--color-bg-select-content)] appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
             id="time-picker"
             type="time"
             value={selectedTime}
@@ -96,7 +96,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
           <DialogFooter className="!items-start">
             <DialogClose asChild>
               <Button
-                className="w-30 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#363636]"
+                className="w-30 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]"
                 onClick={handleReset}
               >
                 Reset
@@ -105,7 +105,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
             <Button
               type="button"
               onClick={handleOk}
-              className="w-20 transition bg-[#595959] text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#646464]"
+              className="w-20 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
             >
               Ok
             </Button>

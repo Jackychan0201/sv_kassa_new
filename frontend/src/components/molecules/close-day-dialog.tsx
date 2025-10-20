@@ -49,28 +49,28 @@ export function CloseDayDialog({
           <DialogTrigger asChild>
             <Button
               disabled={disabled}
-              className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]"
+              className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]"
             >
               Close day
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[425px] border-black bg-[#292929] text-[#f0f0f0]">
+          <DialogContent className="sm:max-w-[425px] border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
             <DialogHeader>
               <DialogTitle>Close shop day</DialogTitle>
             </DialogHeader>
 
             {/* Select shop using Select */}
             <div className="mt-4">
-              <p className="text-sm mb-1 text-[#f0f0f0]">Select shop</p>
+              <p className="text-sm mb-1 text-[var(--color-text-primary)]">Select shop</p>
               <Select
                 value={selectedShop?.id ?? undefined}
                 onValueChange={(val) => setSelectedShop(shops.find((s) => s.id === val) || null)}
               >
-                <SelectTrigger className="w-48 justify-between bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141] hover:text-[#f0f0f0]">
+                <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
                   <SelectValue placeholder="Select shop" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+                <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                   {shops.map((shop) => (
                     <SelectItem key={shop.id} value={shop.id}>
                       {shop.name}
@@ -82,7 +82,7 @@ export function CloseDayDialog({
 
             <DialogFooter className="mt-6">
               <DialogClose asChild>
-                <Button className="w-24 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#363636]">
+                <Button className="w-24 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]">
                   Cancel
                 </Button>
               </DialogClose>
@@ -90,7 +90,7 @@ export function CloseDayDialog({
               <Button
                 type="button"
                 onClick={handleGo}
-                className="w-28 transition bg-[#595959] text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#646464]"
+                className="w-28 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
               >
                 Continue
               </Button>

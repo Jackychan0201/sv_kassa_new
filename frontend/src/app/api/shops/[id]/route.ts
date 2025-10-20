@@ -1,38 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiRequest } from "@/lib/api-client";
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  const cookie = req.headers.get("cookie") ?? "";
-
-  const response = await fetch(`http://localhost:3000/shops/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      cookie,
-    },
-  });
+  const response = await apiRequest(`/shops/${id}`, req);
 
   const data = await response.json();
   return NextResponse.json(data, { status: response.status });
 }
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  const cookie = req.headers.get("cookie") ?? "";
   const body = await req.json();
 
-  const response = await fetch(`http://localhost:3000/shops/${id}`, {
+  const response = await apiRequest(`/shops/${id}`, req, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      cookie,
-    },
     body: JSON.stringify(body),
   });
 
@@ -40,36 +22,24 @@ export async function PATCH(
   const res = NextResponse.json(data, { status: response.status });
 
   const setCookie = response.headers.get("set-cookie");
-  if (setCookie) {
-    const cookies = setCookie.split(";").map((c) => c.trim());
-    const [cookieNameValue] = cookies;
-    const [name, value] = cookieNameValue.split("=");
-
-    res.cookies.set({
-      name,
-      value,
-      httpOnly: true,
-      path: "/",
-    });
-  }
+  if (setCookie) res.headers.set("set-cookie", setCookie);
 
   return res;
 }
 
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const cookie = req.headers.get("cookie") ?? "";
-  const { id } = await params;
-
-  const response = await fetch(`http://localhost:3000/shops/${id}`, {
+  const response = await apiRequest(`/shops/${id}`, req, {
     method: "DELETE",
-    headers: { "Content-Type": "application/json", cookie },
-    credentials: "include",
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    return NextResponse.json({ message: errorData.message || "Failed to delete shop" }, { status: response.status });
+    return NextResponse.json(
+      { message: errorData.message || "Failed to delete shop" },
+      { status: response.status }
+    );
   }
 
   return NextResponse.json({ message: `Shop ${id} deleted successfully` }, { status: 200 });

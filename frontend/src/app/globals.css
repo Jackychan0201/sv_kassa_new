@@ -6,6 +6,37 @@
 @tailwind utilities;
 
 :root {
+  --color-bg-main: #1e1e1e;
+  --color-bg-secondary: #292929;
+  --color-bg-select-trigger: #171717;
+  --color-bg-select-content: #545454;
+  --color-bg-select-hover: #414141;
+
+  --color-button-bg: #595959;
+  --color-button-bg-hover-type1: #363636;
+  --color-button-bg-hover-type2: #646464;
+
+  --color-sidebar-button-active: #555555;
+  --color-sidebar-button-hover: #969696;
+
+  --color-border: #3a3a3a;
+  --color-border-sheet: #3f3e3e;
+  --color-selected: #202020;
+
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #b7b7b7;
+  --color-text-thirdly: #8f8f8f;
+
+  --color-caution: #ff4d4d;
+  
+  --color-calendar-today: #a4a4a4;
+  --color-calendar-disabled: #101010;
+  --color-calendar-hover: #c6c6c6;
+  --color-calendar-selected: #6b6b6b;
+
+  --color-chart-text-type1: #989898;
+  --color-chart-text-type2: #1f1f1f;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

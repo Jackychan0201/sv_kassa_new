@@ -3,8 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { ShopsModule } from '../shops/shops.module';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import jwtConfig from '../config/jwt.config';
+
 
 @Module({
   imports: [
@@ -12,10 +14,10 @@ import { JwtStrategy } from './jwt.strategy';
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: Number(configService.get<string>('JWT_EXPIRES_IN')) },
+      inject: [jwtConfig.KEY],
+      useFactory: (cfg: ConfigType<typeof jwtConfig>) => ({
+        secret: cfg.secret,
+        signOptions: cfg.signOptions,
       }),
     }),
   ],

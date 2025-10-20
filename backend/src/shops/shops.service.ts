@@ -1,7 +1,13 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Shop, ShopRole } from './shop.entity';
+import { Shop } from './shop.entity';
+import { ShopRole } from './shop.role';
 import * as bcrypt from 'bcrypt';
 import { CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
@@ -17,7 +23,9 @@ export class ShopsService {
   ) {}
 
   async createShop(dto: CreateShopDto): Promise<Shop> {
-    const existingShop = await this.shopRepository.findOne({ where: { email: dto.email } });
+    const existingShop = await this.shopRepository.findOne({
+      where: { email: dto.email },
+    });
     if (existingShop) {
       throw new BadRequestException('Shop with this email already exists');
     }
@@ -25,19 +33,22 @@ export class ShopsService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const shop = this.shopRepository.create({
-      name: dto.name,
-      email: dto.email,
+      ...dto,
       password: hashedPassword,
       role: dto.role || ShopRole.SHOP,
       timer: dto.timer || null,
     });
 
-    const savedShop = this.shopRepository.save(shop);
-    const { password, ...result } = await savedShop;
+    const savedShop = await this.shopRepository.save(shop);
+    const { password, ...result } = savedShop;
     return result as Shop;
   }
 
-  async updateShop(user: JwtShop, id: string, dto: UpdateShopDto): Promise<{ shop: Shop; token?: string }> {
+  async updateShop(
+    user: JwtShop,
+    id: string,
+    dto: UpdateShopDto,
+  ): Promise<{ shop: Shop; token?: string }> {
     if (user.role !== ShopRole.CEO && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to update this shop');
     }
@@ -49,13 +60,17 @@ export class ShopsService {
     const shop = await this.shopRepository.findOne({ where: { id } });
     if (!shop) throw new NotFoundException(`Shop with id ${id} not found`);
 
-    if (dto.password) shop.password = await bcrypt.hash(dto.password, 10);
-    if (dto.name) shop.name = dto.name;
-    if (dto.role) shop.role = dto.role;
-    if (dto.timer) shop.timer = dto.timer;
-    if (dto.email) shop.email = dto.email;
+    const updatedFields: Partial<Shop> = { ...dto };
 
-    const updatedShop = await this.shopRepository.save(shop);
+    if (dto.password) {
+      updatedFields.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    const updatedShop = await this.shopRepository.save({
+      ...shop,
+      ...updatedFields,
+    });
+
     const { password, ...result } = updatedShop;
 
     let token: string | undefined;
@@ -73,11 +88,11 @@ export class ShopsService {
     return { shop: result as Shop, token };
   }
 
-
   async deleteShop(user: JwtShop, id: string): Promise<void> {
     if (user.role !== ShopRole.CEO && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to delete this shop');
     }
+
     const result = await this.shopRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Shop with id ${id} not found`);
@@ -85,35 +100,45 @@ export class ShopsService {
   }
 
   findAll(): Promise<Shop[]> {
-    return this.shopRepository.find({select: ['id', 'name', 'email', 'role', 'timer', 'createdAt', 'updatedAt']});
+    return this.shopRepository.find({
+      select: ['id', 'name', 'email', 'role', 'timer', 'createdAt', 'updatedAt'],
+    });
   }
 
   async findById(user: JwtShop, id: string): Promise<Shop> {
     if (user.role !== ShopRole.CEO && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to fetch another shop info');
     }
+
     const shop = await this.shopRepository.findOne({
-         where: { id },
-         select: ['id', 'name', 'email', 'role', 'timer', 'createdAt', 'updatedAt'], 
-        });
+      where: { id },
+      select: ['id', 'name', 'email', 'role', 'timer', 'createdAt', 'updatedAt'],
+    });
+
     if (!shop) {
       throw new NotFoundException(`Shop with id ${id} not found`);
     }
+
     return shop;
   }
 
-  async findByEmail(email: string): Promise<Shop> {
+  async findByIdForAuth(id: string): Promise<Shop | null> {
+    return this.shopRepository.findOne({
+      where: { id },
+      select: ['id', 'name', 'email', 'role', 'timer'],
+    });
+  }
+
+  async findByEmail(email: string): Promise<Shop | null> {
     const shop = await this.shopRepository.findOne({ where: { email } });
-    if (!shop) {
-      throw new NotFoundException(`Shop with email ${email} not found`);
-    }
-    return shop;
+    return shop ?? null;
   }
 
   async findByName(user: JwtShop, name: string): Promise<Shop> {
     if (user.role !== ShopRole.CEO && user.name !== name) {
       throw new ForbiddenException('You are not allowed to fetch another shop info');
     }
+
     const shop = await this.shopRepository.findOne({
       where: { name },
       select: ['id', 'name', 'email', 'role', 'timer', 'createdAt', 'updatedAt'],
@@ -122,6 +147,7 @@ export class ShopsService {
     if (!shop) {
       throw new NotFoundException(`Shop with name "${name}" not found`);
     }
+
     return shop;
   }
 }

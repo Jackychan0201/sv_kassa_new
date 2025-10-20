@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Label } from "@/components/atoms/label";
 import { Button } from "@/components/atoms/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/atoms/sheet";
-import { Input } from "@/components/atoms/input";
 import { toast } from "sonner";
 import { useUser } from "@/components/providers/user-provider";
+import { updateShopAccount } from "@/lib/api";
+import { SheetFormField } from "@/components/molecules/sheet-form-field";
 
 interface EditAccountSheetProps {
   open: boolean;
@@ -18,23 +18,35 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
 
   if (!user) return null;
 
-  const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [form, setForm] = useState({
+    name: user.name,
+    email: user.email,
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleOpenChange = (isOpen: boolean) => {
     onOpenChange(isOpen);
-    if (!isOpen) {
-      setName(user.name);
-      setEmail(user.email);
-      setPassword("");
-      setConfirmPassword("");
-    }
+    if (!isOpen) handleReset();
+  };
+
+  const handleReset = () => {
+    setForm({
+      name: user.name,
+      email: user.email,
+      password: "",
+      confirmPassword: "",
+    });
   };
 
   const handleSave = async () => {
+    const { name, email, password, confirmPassword } = form;
+
     if (!name || !email) {
       toast.error("Name and email are required");
       return;
@@ -53,20 +65,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
       if (email !== user.email) body.email = email;
       if (password.trim() !== "") body.password = password;
 
-      const res = await fetch(`/api/shops/${user.shopId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Failed to update account");
-      }
-
-      const updated = await res.json();
-
+      const updated = await updateShopAccount(user.shopId, body);
       setUser({ ...user, ...updated });
 
       toast.success("Account updated successfully!");
@@ -78,99 +77,64 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
     }
   };
 
-  const handleReset = () => {
-    setName(user.name);
-    setEmail(user.email);
-    setPassword("");
-    setConfirmPassword("");
-  };
-
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side="right" className="h-full flex flex-col bg-[#292929] border-black">
+      <SheetContent side="right" className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black">
         <SheetHeader>
-          <SheetTitle className="text-xl text-[#f0f0f0]">Edit Account Data</SheetTitle>
-          <SheetDescription className="text-lg text-[#b7b7b7]">
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Edit Account Data</SheetTitle>
+          <SheetDescription className="text-lg text-[var(--color-text-secondary)]">
             Update your personal and login information
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 mt-4">
-          {/* Name */}
-          <div>
-            <Label htmlFor="name" className="text-md text-[#f0f0f0] ml-6">
-              Name:
-            </Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="Enter your name"
-              autoComplete="off"
-            />
-          </div>
+          <SheetFormField
+            id="name"
+            label="Name"
+            value={form.name}
+            onChange={(val) => handleChange("name", val)}
+            placeholder="Enter your name"
+          />
 
-          {/* Email */}
-          <div>
-            <Label htmlFor="email" className="text-md text-[#f0f0f0] ml-6">
-              Email:
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="Enter your email"
-              autoComplete="off"
-            />
-          </div>
+          <SheetFormField
+            id="email"
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(val) => handleChange("email", val)}
+            placeholder="Enter your email"
+          />
 
-          {/* Password */}
-          <div>
-            <Label htmlFor="password" className="text-md text-[#f0f0f0] ml-6">
-              New password:
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="Enter new password"
-              autoComplete="new-password"
-            />
-          </div>
+          <SheetFormField
+            id="password"
+            label="New Password"
+            type="password"
+            value={form.password}
+            onChange={(val) => handleChange("password", val)}
+            placeholder="Enter new password"
+          />
 
-          {/* Confirm Password */}
-          <div>
-            <Label htmlFor="confirmPassword" className="text-md text-[#f0f0f0] ml-6">
-              Confirm new password:
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="Confirm new password"
-              autoComplete="new-password"
-            />
-          </div>
+          <SheetFormField
+            id="confirmPassword"
+            label="Confirm New Password"
+            type="password"
+            value={form.confirmPassword}
+            onChange={(val) => handleChange("confirmPassword", val)}
+            placeholder="Confirm new password"
+          />
         </div>
 
         <div className="mt-auto mb-4 flex flex-col w-[90%] mx-auto gap-2">
           <Button
             onClick={handleSave}
             disabled={loading}
-            className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#414141]"
+            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
             {loading ? "Saving..." : "Save changes"}
           </Button>
           <Button
             onClick={handleReset}
-            className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#414141]"
+            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
             Reset
           </Button>

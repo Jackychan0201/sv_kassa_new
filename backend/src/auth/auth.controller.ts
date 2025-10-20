@@ -5,6 +5,8 @@ import type { Request } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './auth.guard';
+import { JwtShop } from './jwt-shop.type';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -12,6 +14,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Throttle({ default: { limit: 3, ttl: (1 * 60 * 1000) } })
   @ApiOperation({ summary: 'Login as a shop' })
   async login(
     @Body() dto: LoginDto,
@@ -45,10 +48,9 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Req() req) {
-    const user = req.user;
+  getProfile(@Req() req: Request) {
+    const user = req.user as JwtShop;
     return {
-      id: user.id,
       shopId: user.shopId,
       name: user.name,
       email: user.email,

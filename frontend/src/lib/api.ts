@@ -201,3 +201,19 @@ export const deleteShop = async (shopId: string) => {
 
   return res.json();
 };
+
+export const updateShopAccount = async (shopId: string, data: Record<string, any>) => {
+  const res = await fetch(`/api/shops/${shopId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to update account");
+  }
+
+  return res.json();
+};

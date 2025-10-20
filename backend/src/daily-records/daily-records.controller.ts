@@ -6,7 +6,6 @@ import { JwtAuthGuard } from '../auth/auth.guard';
 import type { Request } from 'express';
 import { JwtShop } from 'src/auth/jwt-shop.type';
 import { Query } from '@nestjs/common';
-import { ShopRole } from 'src/shops/shop.entity';
 import { UpdateDailyRecordDto } from './dto/update-daily-record.dto';
 
 

@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiRequest } from "@/lib/api-client";
 
 export async function PATCH(req: NextRequest) {
-  const cookie = req.headers.get("cookie") ?? "";
   const body = await req.json();
   const id = body.id;
 
-  const response = await fetch(`http://localhost:3000/daily-records/${id}`, {
+  const response = await apiRequest(`/daily-records/${id}`, req, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      cookie,
-    },
-    credentials: "include",
     body: JSON.stringify(body),
   });
 

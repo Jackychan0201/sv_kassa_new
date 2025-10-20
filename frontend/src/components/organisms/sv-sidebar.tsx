@@ -21,6 +21,7 @@ import {
 import { ChevronUp } from "lucide-react";
 import { logout } from "@/lib/api";
 import { useUser } from "../providers/user-provider";
+import { handleError } from "@/lib/utils";
 
 export function SVSidebar() {
   const user = useUser();
@@ -34,7 +35,7 @@ export function SVSidebar() {
       await logout();
       router.push("/login");
     } catch (err: any) {
-      console.error(err.message);
+      handleError(err);
     }
   };
 
@@ -46,12 +47,12 @@ export function SVSidebar() {
   if (user.user.role === 'CEO') links.push({ key: "shops", label: "Manage shops", href: "/shops" });
 
   return (
-    <Sidebar className="w-40 border-black text-[#f0f0f0]">
-      <SidebarHeader className="bg-[#292929] font-bold">
+    <Sidebar className="w-40 border-black text-[var(--color-text-primary)]">
+      <SidebarHeader className="bg-[var(--color-bg-secondary)] font-bold">
         Navigation
       </SidebarHeader>
 
-      <SidebarContent className="bg-[#292929]">
+      <SidebarContent className="bg-[var(--color-bg-secondary)]">
         <SidebarMenu>
           {links.map((link) => {
             const isActive = pathname.startsWith(link.href);
@@ -62,8 +63,8 @@ export function SVSidebar() {
                   asChild
                   className={`transition-colors ${
                     isActive
-                      ? "bg-[#555555] text-[#f0f0f0] font-semibold"
-                      : "hover:bg-[#969696]"
+                      ? "bg-[var(--color-sidebar-button-active)] text-[var(--color-text-primary)] font-semibold"
+                      : "hover:bg-[var(--color-sidebar-button-hover)]"
                   }`}
                 >
                   <Link href={link.href}>
@@ -76,11 +77,11 @@ export function SVSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="bg-[#292929]">
+      <SidebarFooter className="bg-[var(--color-bg-secondary)]">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              <DropdownMenuTrigger className="hover:bg-[#969696]" asChild>
+              <DropdownMenuTrigger className="hover:bg-[var(--color-sidebar-button-hover)]" asChild>
                 <SidebarMenuButton>
                   <Label>{user.user.name}</Label>
                   <ChevronUp className="ml-auto" />
@@ -88,7 +89,7 @@ export function SVSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"
-                className="w-[--radix-popper-anchor-width] bg-[#969696]"
+                className="w-[--radix-popper-anchor-width] bg-[var(--color-sidebar-button-hover)]"
               >
                 <DropdownMenuItem asChild>
                   <Link href="/account">

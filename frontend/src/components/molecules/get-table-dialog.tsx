@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/select";
+import { handleError } from "@/lib/utils";
 
 export function GetTableDialog() {
   const { user } = useUser();
@@ -51,7 +52,7 @@ export function GetTableDialog() {
           const allShops = await getAllShops();
           setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
         } catch (err) {
-          console.error("Failed to fetch shops:", err);
+          handleError(err, "Failed to fetch shops");
         }
       }
     };
@@ -101,15 +102,15 @@ export function GetTableDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <form>
         <DialogTrigger asChild>
-          <Button className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]">
+          <Button className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
             Show table
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[1000px] border-black bg-[#292929] text-[#f0f0f0]">
+        <DialogContent className="sm:max-w-[1000px] border-black bg-[var(--color-bg-secondary)olor-bg-secondary)] text-[var(--color-text-primary)]">
           <DialogHeader>
             <DialogTitle>Daily Records Table</DialogTitle>
-            <DialogDescription className="text-[#f0f0f0]">
+            <DialogDescription className="text-[var(--color-text-primary)]">
               Select a date range to view multiple records
             </DialogDescription>
           </DialogHeader>
@@ -117,15 +118,15 @@ export function GetTableDialog() {
           {/* CEO-only shop selector */}
           {user?.role === "CEO" && (
             <div className="mt-4">
-              <p className="text-sm mb-1 text-[#f0f0f0]">Select shop</p>
+              <p className="text-sm mb-1 text-[var(--color-text-primary)]">Select shop</p>
               <Select
                 value={selectedShop}
                 onValueChange={(val) => setSelectedShop(val)}
               >
-                <SelectTrigger className="w-48 justify-between bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141] hover:text-[#f0f0f0]">
+                <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
                   <SelectValue placeholder="Select shop" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+                <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                   <SelectItem value="ALL">All</SelectItem>
                   {shops.map((shop) => (
                     <SelectItem key={shop.id} value={shop.id}>
@@ -147,26 +148,26 @@ export function GetTableDialog() {
           <div className="mt-4">
             {loading && <p>Loading...</p>}
             {!loading && records && records.length > 0 && (
-              <ScrollArea className="h-[30vh] w-full rounded-lg border border-[#3f3e3e]">
+              <ScrollArea className="h-[30vh] w-full rounded-lg border border-[var(--color-border-sheet)]">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[#f0f0f0]">Record date</TableHead>
+                      <TableHead className="text-[var(--color-text-primary)]">Record date</TableHead>
                       {user?.role === "CEO" && (
-                        <TableHead className="text-[#f0f0f0]">Shop</TableHead>
+                        <TableHead className="text-[var(--color-text-primary)]">Shop</TableHead>
                       )}
-                      <TableHead className="text-[#f0f0f0]">Main stock value</TableHead>
-                      <TableHead className="text-[#f0f0f0]">Order stock value</TableHead>
-                      <TableHead className="text-[#f0f0f0]">
+                      <TableHead className="text-[var(--color-text-primary)]">Main stock value</TableHead>
+                      <TableHead className="text-[var(--color-text-primary)]">Order stock value</TableHead>
+                      <TableHead className="text-[var(--color-text-primary)]">
                         Revenue main stock (with margin)
                       </TableHead>
-                      <TableHead className="text-[#f0f0f0]">
+                      <TableHead className="text-[var(--color-text-primary)]">
                         Revenue main stock (without margin)
                       </TableHead>
-                      <TableHead className="text-[#f0f0f0]">
+                      <TableHead className="text-[var(--color-text-primary)]">
                         Revenue order stock (with margin)
                       </TableHead>
-                      <TableHead className="text-[#f0f0f0]">
+                      <TableHead className="text-[var(--color-text-primary)]">
                         Revenue order stock (without margin)
                       </TableHead>
                     </TableRow>
@@ -193,20 +194,20 @@ export function GetTableDialog() {
               </ScrollArea>
             )}
             {!loading && records && records.length === 0 && (
-              <p className="text-[#b7b7b7] mt-4">No records found in this range.</p>
+              <p className="text-[var(--color-text-secondary)] mt-4">No records found in this range.</p>
             )}
           </div>
 
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button className="w-30 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#363636]">
+              <Button className="w-30 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]">
                 Close
               </Button>
             </DialogClose>
             <Button
               type="button"
               onClick={handleFetch}
-              className="w-20 transition bg-[#595959] text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#646464]"
+              className="w-20 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
             >
               Go
             </Button>

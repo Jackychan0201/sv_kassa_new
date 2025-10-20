@@ -239,17 +239,17 @@ export default function StatisticsPage() {
   return (
     <div className="flex flex-col">
       <Label className="text-3xl font-bold mb-1">Statistics</Label>
-      <Label className="text-lg text-[#f0f0f0] mb-6">Get advanced statistics about the shop</Label>
+      <Label className="text-lg text-[var(--color-text-primary)] mb-6">Get advanced statistics about the shop</Label>
 
       {/* --- CEO shop selector --- */}
       {user.role === "CEO" && (
         <div className="mb-4">
           <Label className="mb-1">Select Shop:</Label>
           <Select value={selectedShopId} onValueChange={setSelectedShopId}>
-            <SelectTrigger className="w-48 bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141] hover:text-[#f0f0f0]">
+            <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
               <SelectValue placeholder="Select shop" />
             </SelectTrigger>
-            <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+            <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
               <SelectItem value="ALL">ALL</SelectItem>
               {shops.map((shop) => (
                 <SelectItem key={shop.id} value={shop.id}>
@@ -433,8 +433,8 @@ export default function StatisticsPage() {
 
         {/* Right column: Advice */}
         <div className="mt-4 mr-4 lg:mt-0">
-          <div className="p-4 rounded-md bg-[#292929] flex flex-col justify-start">
-            <Label className="font-semibold text-xl text-[#f0f0f0] mb-2">Advice</Label>
+          <div className="p-4 rounded-md bg-[var(--color-bg-secondary)] flex flex-col justify-start">
+            <Label className="font-semibold text-xl text-[var(--color-text-primary)] mb-2">Advice</Label>
             <div className="flex flex-col gap-1">
               {adviceList.map((item, idx) => (
                 <Label key={idx} className="text-md text-gray-300 block">

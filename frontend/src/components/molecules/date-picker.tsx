@@ -43,7 +43,7 @@ export function DatePicker({ title, value, onChange }: DatePickerProps) {
         <PopoverTrigger asChild>
           <Button
             id="date"
-            className="w-48 text-[#f0f0f0] justify-between font-normal hover:bg-[#414141]"
+            className="w-48 text-[var(--color-text-primary)] justify-between font-normal hover:bg-[var(--color-bg-select-hover)]"
           >
             {selectedDate
               ? selectedDate.toLocaleDateString("de-DE", {
@@ -56,7 +56,7 @@ export function DatePicker({ title, value, onChange }: DatePickerProps) {
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto overflow-hidden p-0 shadow-none bg-[#545454] border border-black"
+          className="w-auto overflow-hidden p-0 shadow-none bg-[var(--color-bg-select-content)] border border-black"
           align="start"
         >
           <Calendar

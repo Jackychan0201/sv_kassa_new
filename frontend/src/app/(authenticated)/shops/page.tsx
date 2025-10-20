@@ -8,6 +8,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { EditShopSheet } from "@/components/organisms/edit-shop-sheet";
 import { CreateShopSheet } from "@/components/organisms/create-shop-sheet";
 import { DeleteShopDialog } from "@/components/molecules/delete-shop-dialog";
+import { handleError } from "@/lib/utils";
 
 interface Shop {
   id: string;
@@ -38,7 +39,7 @@ export default function ManageShopsPage() {
         .sort((a, b) => a.name.localeCompare(b.name));
       setShops(filtered);
     } catch (err) {
-      console.error(err);
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ export default function ManageShopsPage() {
   return (
     <div className="flex flex-col">
       <Label className="text-3xl font-bold mb-1">Manage Shops</Label>
-      <Label className="text-lg text-[#f0f0f0] mb-6">
+      <Label className="text-lg text-[var(--color-text-primary)] mb-6">
         View, edit, or create shop accounts below.
       </Label>
 
@@ -74,12 +75,12 @@ export default function ManageShopsPage() {
         {shops.map((shop) => (
           <div
             key={shop.id}
-            className="flex max-w-1/3 items-center justify-between bg-[#292929] rounded-lg p-4 border border-[#3a3a3a]"
+            className="flex max-w-1/3 items-center justify-between bg-[var(--color-bg-secondary)] rounded-lg p-4 border border-[var(--color-border)]"
           >
             <div className="flex flex-col">
-              <Label className="text-lg text-[#f0f0f0]">{shop.name}</Label>
-              <Label className="text-sm text-[#b7b7b7]">{shop.email}</Label>
-              <Label className="text-sm text-[#8f8f8f]">
+              <Label className="text-lg text-[var(--color-text-primary)]">{shop.name}</Label>
+              <Label className="text-sm text-[var(--color-text-secondary)]">{shop.email}</Label>
+              <Label className="text-sm text-[var(--color-text-thirdly)]">
                 Role: {shop.role}
               </Label>
             </div>
@@ -87,7 +88,7 @@ export default function ManageShopsPage() {
             <div className="flex flex-row gap-x-4">
               <Button
                 onClick={() => handleEditClick(shop)}
-                className="text-[#f0f0f0] hover:bg-[#414141] transition ease-in-out hover:scale-105"
+                className="text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] transition ease-in-out hover:scale-105"
               >
                 Edit
               </Button>
@@ -96,7 +97,7 @@ export default function ManageShopsPage() {
                 shop={shop}
                 onDeleted={fetchShops}
                 trigger={
-                  <Button className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#ff4d4d]">
+                  <Button className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-caution)]">
                     Delete
                   </Button>
                 }
@@ -109,7 +110,7 @@ export default function ManageShopsPage() {
       <div className="flex flex-row mt-6 gap-x-5">
         <Button
           onClick={() => setCreateOpen(true)}
-          className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]"
+          className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]"
         >
           Create New Shop
         </Button>

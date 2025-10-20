@@ -1,39 +1,47 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import databaseConfig from './config/database.config';
 import { Shop } from './shops/shop.entity';
 import { DailyRecord } from './daily-records/daily-record.entity';
 import { ShopsModule } from './shops/shops.module';
 import { AuthModule } from './auth/auth.module';
 import { DailyRecordsModule } from './daily-records/daily-records.module';
+import jwtConfig from './config/jwt.config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '../.env',
-     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASS'),
-        database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: true,
-        retryAttempts: 3,
-        retryDelay: 3000,
-      }),
+      load: [databaseConfig, jwtConfig],
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.get('database');
+        return {
+          ...dbConfig,
+        };
+      },
+    }),
+    ThrottlerModule.forRoot([{
+        ttl: 60,
+        limit: 5,        
+    }]),
     TypeOrmModule.forFeature([Shop, DailyRecord]),
     ShopsModule,
     AuthModule,
     DailyRecordsModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ]
 })
 export class AppModule {}

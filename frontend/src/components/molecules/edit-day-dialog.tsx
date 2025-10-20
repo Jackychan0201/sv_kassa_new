@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/select";
+import { handleError } from "@/lib/utils";
 
 interface EditDayDialogProps {
   onSaved?: () => void;
@@ -51,7 +52,7 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
               .sort((a, b) => a.name.localeCompare(b.name))
           );
         } catch (err) {
-          console.error("Failed to load shops", err);
+          handleError(err, "Failed to load shops");
         }
       } else if (user.role === "SHOP" && user.shopId) {
         const shopData = {
@@ -95,15 +96,15 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <form>
           <DialogTrigger asChild>
-            <Button className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]">
+            <Button className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
               Edit data
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[425px] border-black bg-[#292929] text-[#f0f0f0]">
+          <DialogContent className="sm:max-w-[425px] border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
             <DialogHeader>
               <DialogTitle>Edit data</DialogTitle>
-              <DialogDescription className="text-[#f0f0f0]">
+              <DialogDescription className="text-[var(--color-text-primary)]">
                 Pick a date and shop to edit
               </DialogDescription>
             </DialogHeader>
@@ -113,17 +114,17 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
             {/* Show the Select only if user is CEO */}
             {selectedDate && user?.role === "CEO" && shops.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm mb-1 text-[#f0f0f0]">Select shop</p>
+                <p className="text-sm mb-1 text-[var(--color-text-primary)]">Select shop</p>
                 <Select
                   value={selectedShop?.id ?? undefined}
                   onValueChange={(val) =>
                     setSelectedShop(shops.find((s) => s.id === val) || null)
                   }
                 >
-                  <SelectTrigger className="w-48 justify-between bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141] hover:text-[#f0f0f0]">
+                  <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
                     <SelectValue placeholder="Select shop" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+                  <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                     {shops.map((shop) => (
                       <SelectItem key={shop.id} value={shop.id}>
                         {shop.name}
@@ -136,14 +137,14 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button className="w-30 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#363636]">
+                <Button className="w-30 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]">
                   Cancel
                 </Button>
               </DialogClose>
               <Button
                 type="button"
                 onClick={handleGo}
-                className="w-20 transition bg-[#595959] text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#646464]"
+                className="w-20 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
               >
                 Go
               </Button>

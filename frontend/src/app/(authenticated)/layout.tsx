@@ -4,14 +4,13 @@ import DotGrid from "@/components/organisms/DotGrid";
 import { UserProvider, useUser } from "@/components/providers/user-provider";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { TimerNotification } from "@/components/molecules/notification";
 import { TimerNotificationClient } from "@/components/molecules/timer-notification-client";
 
 async function checkAuth() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get("Authentication")?.value;
 
-  const res = await fetch("http://localhost:3000/auth/me", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/me`, {
     headers: {
       cookie: authToken ? `Authentication=${authToken}` : "",
     },
@@ -32,7 +31,7 @@ export default async function AuthenticatedLayout({
 
   return (
     <UserProvider user={user}>
-      <div className="bg-[#1e1e1e] relative h-screen w-screen">
+      <div className="relative h-screen w-screen bg-[var(--color-bg-main)]">
         <SidebarProvider defaultOpen={true}>
           <SVSidebar />
 
@@ -50,7 +49,7 @@ export default async function AuthenticatedLayout({
             />
           </div>
 
-          <div className="relative z-10 ml-45 mt-3 text-[#f0f0f0] w-full">
+          <div className="relative z-10 ml-45 mt-3 text-[var(--color-text-primary)] w-full">
             {children}
             <TimerNotificationClient />
           </div>

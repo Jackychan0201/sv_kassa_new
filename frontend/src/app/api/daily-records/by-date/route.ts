@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiRequest } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
-  const cookie = req.headers.get("cookie") ?? "";
   const { searchParams } = new URL(req.url);
   const fromDate = searchParams.get("fromDate");
   const toDate = searchParams.get("toDate");
@@ -13,17 +13,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const response = await fetch(
-    `http://localhost:3000/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        cookie,
-      },
-      credentials: "include",
-    }
-  );
-
+  const response = await apiRequest(`/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}`, req);
   const data = await response.json();
   return NextResponse.json(data, { status: response.status });
 }

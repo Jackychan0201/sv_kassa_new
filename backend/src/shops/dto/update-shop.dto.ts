@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, Matches, MinLength } from 'class-validator';
-import { ShopRole } from '../shop.entity';
+import { IsEmail, IsMilitaryTime, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { ShopRole } from '../shop.role';
 
 export class UpdateShopDto {
   @ApiProperty({ example: 'shop11@example.com', required: false })
@@ -9,10 +9,14 @@ export class UpdateShopDto {
   @IsEmail()
   email?: string;
 
-  @ApiProperty({ example: '9999', required: false })
+  @ApiProperty({ example: 'P@ssw0rd123!', required: false })
   @IsOptional()
   @IsString()
-  @MinLength(4)
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @Matches(/(?=.*[A-Z])/, { message: 'Password must contain at least one uppercase letter' })
+  @Matches(/(?=.*[a-z])/, { message: 'Password must contain at least one lowercase letter' })
+  @Matches(/(?=.*\d)/, { message: 'Password must contain at least one number' })
+  @Matches(/(?=.*[@$!%*?&])/, { message: 'Password must contain at least one special character (@$!%*?&)' })
   password?: string;
 
   @ApiProperty({ example: 'NewShop', required: false })
@@ -26,8 +30,6 @@ export class UpdateShopDto {
 
   @ApiProperty({ example: "17:30", description: 'Timer for the shop', required: false })
   @IsOptional()
-  @Matches(/^([0-1]\d|2[0-3]):([0-5]\d)$/, {
-    message: 'Timer must be in HH:mm format',
-  })
+  @IsMilitaryTime({ message: 'Timer must be a valid 24-hour time in HH:mm format' })
   timer?: string | null;
 }

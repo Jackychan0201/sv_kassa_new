@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Label } from "@/components/atoms/label";
 import { Button } from "@/components/atoms/button";
 import {
   Sheet,
@@ -10,7 +9,6 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/atoms/sheet";
-import { Input } from "@/components/atoms/input";
 import { toast } from "sonner";
 import { createShop } from "@/lib/api";
 import {
@@ -20,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/select";
+import { SheetFormField } from "@/components/molecules/sheet-form-field";
+import { Label } from "../atoms/label";
 
 interface CreateShopSheetProps {
   open: boolean;
@@ -28,14 +28,32 @@ interface CreateShopSheetProps {
 }
 
 export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopSheetProps) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("SHOP");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    role: "SHOP",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
 
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleReset = () => {
+    setForm({
+      name: "",
+      email: "",
+      role: "SHOP",
+      password: "",
+      confirmPassword: "",
+    });
+  };
+
   const handleSave = async () => {
+    const { name, email, password, confirmPassword, role } = form;
+
     if (!name || !email || !password) {
       toast.error("All fields are required");
       return;
@@ -51,10 +69,7 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
       toast.success("Shop created successfully!");
       onCreate();
       onOpenChange(false);
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      handleReset();
     } catch (err: any) {
       toast.error(err.message || "Failed to create shop");
     } finally {
@@ -64,79 +79,75 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="h-full flex flex-col bg-[#292929] border-black">
+      <SheetContent
+        side="right"
+        className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black"
+      >
         <SheetHeader>
-          <SheetTitle className="text-xl text-[#f0f0f0]">Create New Shop</SheetTitle>
-          <SheetDescription className="text-lg text-[#b7b7b7]">
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Create New Shop</SheetTitle>
+          <SheetDescription className="text-lg text-[var(--color-text-secondary)]">
             Add a new shop account to your system.
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 mt-4">
-          <div>
-            <Label htmlFor="name" className="text-md text-[#f0f0f0] ml-6">Name:</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-            />
-          </div>
+          <SheetFormField
+            id="name"
+            label="Name"
+            value={form.name}
+            onChange={(val) => handleChange("name", val)}
+            placeholder="Enter shop name"
+          />
+
+          <SheetFormField
+            id="email"
+            label="Email"
+            value={form.email}
+            onChange={(val) => handleChange("email", val)}
+            placeholder="Enter email"
+            type="email"
+          />
 
           <div>
-            <Label htmlFor="email" className="text-md text-[#f0f0f0] ml-6">Email:</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="role" className="text-md text-[#f0f0f0] ml-6">Role:</Label>
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="w-[90%] mx-auto justify-between bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141]">
+            <Label htmlFor="role" className="text-md text-[var(--color-text-primary)] ml-6">Role:</Label>
+            <Select
+              value={form.role}
+              onValueChange={(value) => handleChange("role", value)}
+            >
+              <SelectTrigger className="w-[90%] mx-auto justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]">
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
-              <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+              <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                 <SelectItem value="SHOP">SHOP</SelectItem>
                 <SelectItem value="CEO">CEO</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="password" className="text-md text-[#f0f0f0] ml-6">Password:</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-            />
-          </div>
+          <SheetFormField
+            id="password"
+            label="Password"
+            value={form.password}
+            onChange={(val) => handleChange("password", val)}
+            placeholder="Enter password"
+            type="password"
+          />
 
-          <div>
-            <Label htmlFor="confirmPassword" className="text-md text-[#f0f0f0] ml-6">
-              Confirm Password:
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-            />
-          </div>
+          <SheetFormField
+            id="confirmPassword"
+            label="Confirm Password"
+            value={form.confirmPassword}
+            onChange={(val) => handleChange("confirmPassword", val)}
+            placeholder="Confirm password"
+            type="password"
+          />
         </div>
 
         <div className="mt-auto mb-4 flex flex-col w-[90%] mx-auto gap-2">
           <Button
             onClick={handleSave}
             disabled={loading}
-            className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:scale-105 hover:bg-[#414141]"
+            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
             {loading ? "Creating..." : "Create Shop"}
           </Button>

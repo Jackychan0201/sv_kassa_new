@@ -15,6 +15,7 @@ import {
 import { deleteShop } from "@/lib/api";
 import { Shop } from "@/lib/types";
 import { toast } from "sonner";
+import { handleError } from "@/lib/utils";
 
 interface DeleteShopDialogProps {
   shop: Shop | null;
@@ -35,8 +36,7 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
       onDeleted?.();
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Failed to delete shop");
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
 
-      <DialogContent className="max-w-[400px] border-black bg-[#292929] text-[#f0f0f0]">
+      <DialogContent className="max-w-[400px] border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
         <DialogHeader>
           <DialogTitle>Delete Shop</DialogTitle>
           <DialogDescription>
@@ -60,14 +60,14 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
 
         <DialogFooter className="flex justify-end gap-2 mt-4">
           <DialogClose asChild>
-            <Button className="disabled:opacity-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]">
+            <Button className="disabled:opacity-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
               Cancel
             </Button>
           </DialogClose>
           <Button
             onClick={handleDelete}
             disabled={loading}
-            className="bg-red-500 hover:bg-red-600 w-20 transition text-[#f0f0f0] delay-150 duration-300 hover:-translate-y-0 hover:scale-110 ease-in-out"
+            className="bg-red-500 hover:bg-red-600 w-20 transition text-[var(--color-text-primary)] delay-150 duration-300 hover:-translate-y-0 hover:scale-110 ease-in-out"
           >
             {loading ? "Deleting..." : "Delete"}
           </Button>

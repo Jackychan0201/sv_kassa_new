@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/select";
+import { handleError } from "@/lib/utils";
 
 const chartOptions = [
   { key: "mainStockValue", label: "Main stock value" },
@@ -83,7 +84,7 @@ export function GetChartDialog() {
           setSelectedShops(filtered.map((s) => s.id));
           setSelectAll(true);
         } catch (err) {
-          console.error("Failed to load shops", err);
+          handleError(err, "Failed to load shops");
         }
       }
     };
@@ -176,15 +177,15 @@ export function GetChartDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <form>
         <DialogTrigger asChild>
-          <Button className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]">
+          <Button className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
             Show chart
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="max-w-[70vw] max-h-[90vh] overflow-y-auto border-black bg-[#292929] text-[#f0f0f0]">
+        <DialogContent className="max-w-[70vw] max-h-[90vh] overflow-y-auto border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
           <DialogHeader>
             <DialogTitle>Daily Records Chart</DialogTitle>
-            <DialogDescription className="text-[#f0f0f0]">
+            <DialogDescription className="text-[var(--color-text-primary)]">
               Select a date range and a metric to display chart
             </DialogDescription>
           </DialogHeader>
@@ -198,10 +199,10 @@ export function GetChartDialog() {
                 value={selectedMetric ?? undefined}
                 onValueChange={(val) => setSelectedMetric(val)}
               >
-                <SelectTrigger className="w-48 justify-between bg-[#171717] border-0 text-[#f0f0f0] hover:bg-[#414141] hover:text-[#f0f0f0]">
+                <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
                   <SelectValue placeholder="Select metric" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#545454] text-[#f0f0f0]">
+                <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                   {chartOptions.map((opt) => (
                     <SelectItem key={opt.key} value={opt.key}>
                       {opt.label}
@@ -306,7 +307,7 @@ export function GetChartDialog() {
                           .map((shop, idx) => (
                             <div
                               key={shop.id}
-                              className="flex items-center gap-2 text-sm text-[#f0f0f0]"
+                              className="flex items-center gap-2 text-sm text-[var(--color-text-primary)]"
                             >
                               <span
                                 className="w-3 h-3 rounded-full"
@@ -325,7 +326,7 @@ export function GetChartDialog() {
               </div>
             )}
             {!loading && records && records.length === 0 && (
-              <p className="text-[#b7b7b7] mt-4">
+              <p className="text-[var(--color-text-secondary)] mt-4">
                 No records found in this range.
               </p>
             )}
@@ -333,14 +334,14 @@ export function GetChartDialog() {
 
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button className="w-30 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#363636]">
+              <Button className="w-30 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]">
                 Close
               </Button>
             </DialogClose>
             <Button
               type="button"
               onClick={handleFetch}
-              className="w-20 transition bg-[#595959] text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#646464]"
+              className="w-20 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
             >
               Go
             </Button>

@@ -1,11 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { DailyRecord } from '../daily-records/daily-record.entity';
 import { Exclude } from 'class-transformer';
-
-export enum ShopRole {
-  CEO = 'CEO',
-  SHOP = 'SHOP',
-}
+import { ShopRole } from './shop.role';
 
 @Entity('shops')
 export class Shop {
@@ -32,7 +35,9 @@ export class Shop {
   @Column({ type: 'varchar', nullable: true })
   timer: string | null;
 
-  @OneToMany(() => DailyRecord, (record) => record.shop)
+  @OneToMany(() => DailyRecord, (record) => record.shop, {
+    cascade: ['remove'],
+  })
   dailyRecords: DailyRecord[];
 
   @CreateDateColumn()

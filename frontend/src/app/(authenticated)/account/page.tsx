@@ -8,6 +8,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { logout } from "@/lib/api";
 import { EditAccountSheet } from "@/components/organisms/edit-account-sheet";
+import { handleError } from "@/lib/utils";
 
 export default function AccountPage() {
   const { user } = useUser();
@@ -22,7 +23,7 @@ export default function AccountPage() {
       await logout();
       router.push("/login");
     } catch (err: any) {
-      console.error(err.message);
+      handleError(err.message);
     }
   };
 
@@ -39,14 +40,14 @@ export default function AccountPage() {
       <div className="flex flex-row mt-10 gap-x-5">
         <Button
           onClick={() => setOpen(true)}
-          className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#414141]"
+          className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
         >
           Change Account Data
         </Button>
 
         <Button
           onClick={handleLogout}
-          className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#ff4d4d]"
+          className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-caution)]"
         >
           Logout
         </Button>

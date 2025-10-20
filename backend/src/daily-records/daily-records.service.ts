@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { DailyRecord } from './daily-record.entity';
 import { CreateDailyRecordDto } from './dto/create-daily-record.dto';
-import { Shop, ShopRole } from '../shops/shop.entity';
+import { Shop } from '../shops/shop.entity';
 import { JwtShop } from '../auth/jwt-shop.type';
 import { UpdateDailyRecordDto } from './dto/update-daily-record.dto';
+import { ShopRole } from '../shops/shop.role';
 
 @Injectable()
 export class DailyRecordsService {
@@ -30,8 +31,8 @@ export class DailyRecordsService {
 
 
   async create(dto: CreateDailyRecordDto, user: JwtShop): Promise<DailyRecord> {
-    if (user.role === ShopRole.SHOP) {
-      dto.shopId = user.shopId;
+    if (user.role === ShopRole.SHOP && dto.shopId !== user.shopId) {
+      throw new ForbiddenException('You don\'t have access to this shop data');
     }
 
     if (user.role === ShopRole.CEO && !dto.shopId) {

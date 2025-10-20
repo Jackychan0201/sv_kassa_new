@@ -10,8 +10,6 @@ export type User = {
   timer?: string | null;
 };
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
-
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
@@ -20,12 +18,19 @@ type UserContextType = {
   setTimer: (timer: string | null) => void;
 };
 
-export function UserProvider({ children, user: initialUser }: { children: ReactNode; user?: User | null }) {
+const UserContext = createContext<UserContextType | undefined>(undefined);
+
+type UserProviderProps = {
+  children: ReactNode;
+  user?: User | null;
+};
+
+export function UserProvider({ children, user: initialUser }: UserProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser ?? null);
 
-  const setName = (name: string) => user && setUser({ ...user, name });
-  const setEmail = (email: string) => user && setUser({ ...user, email });
-  const setTimer = (timer: string | null) => user && setUser({ ...user, timer });
+  const setName = (name: string) => setUser(prev => (prev ? { ...prev, name } : prev));
+  const setEmail = (email: string) => setUser(prev => (prev ? { ...prev, email } : prev));
+  const setTimer = (timer: string | null) => setUser(prev => (prev ? { ...prev, timer } : prev));
 
   return (
     <UserContext.Provider value={{ user, setUser, setName, setEmail, setTimer }}>

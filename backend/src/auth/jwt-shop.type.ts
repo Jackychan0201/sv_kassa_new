@@ -1,4 +1,4 @@
-import { ShopRole } from '../shops/shop.entity';
+import { ShopRole } from '../shops/shop.role';
 
 export interface JwtShop {
   shopId: string; 

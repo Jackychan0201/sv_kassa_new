@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { apiRequest } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
-  const cookie = req.headers.get("cookie") ?? "";
-  const res = await fetch("http://localhost:3000/auth/me", { headers: { cookie } });
-  const data = await res.json();
-  return NextResponse.json(data);
+  const response = await apiRequest("/auth/me", req);
+  const data = await response.json();
+  return NextResponse.json(data, { status: response.status });
 }

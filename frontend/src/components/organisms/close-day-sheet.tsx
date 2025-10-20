@@ -10,12 +10,12 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/atoms/sheet";
-import { Input } from "@/components/atoms/input";
 import { Label } from "@/components/atoms/label";
 import { toast } from "sonner";
 import { postDailyRecord } from "@/lib/api";
 import { useUser } from "@/components/providers/user-provider";
 import { LoadingFallback } from "@/components/molecules/loading-fallback";
+import { SheetFormField } from "@/components/molecules/sheet-form-field";
 
 interface CloseDaySheetProps {
   disabled?: boolean;
@@ -38,13 +38,16 @@ export function CloseDaySheet({
 }: CloseDaySheetProps) {
   const { user } = useUser();
   const [internalOpen, setInternalOpen] = useState(open);
+  const [loading, setLoading] = useState(false);
 
-  const [mainStockValue, setMainStockValue] = useState("");
-  const [orderStockValue, setOrderStockValue] = useState("");
-  const [mainRevenueWithMargin, setMainRevenueWithMargin] = useState("");
-  const [mainRevenueWithoutMargin, setMainRevenueWithoutMargin] = useState("");
-  const [orderRevenueWithMargin, setOrderRevenueWithMargin] = useState("");
-  const [orderRevenueWithoutMargin, setOrderRevenueWithoutMargin] = useState("");
+  const [form, setForm] = useState({
+    mainStockValue: "",
+    orderStockValue: "",
+    mainRevenueWithMargin: "",
+    mainRevenueWithoutMargin: "",
+    orderRevenueWithMargin: "",
+    orderRevenueWithoutMargin: "",
+  });
 
   const handleOpenChange = (isOpen: boolean) => {
     setInternalOpen(isOpen);
@@ -55,22 +58,28 @@ export function CloseDaySheet({
   };
 
   const handleReset = () => {
-    setMainStockValue("");
-    setOrderStockValue("");
-    setMainRevenueWithMargin("");
-    setMainRevenueWithoutMargin("");
-    setOrderRevenueWithMargin("");
-    setOrderRevenueWithoutMargin("");
+    setForm({
+      mainStockValue: "",
+      orderStockValue: "",
+      mainRevenueWithMargin: "",
+      mainRevenueWithoutMargin: "",
+      orderRevenueWithMargin: "",
+      orderRevenueWithoutMargin: "",
+    });
+  };
+
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
-    const fields = [
-      { label: "Main stock value", value: mainStockValue },
-      { label: "Order stock value", value: orderStockValue },
-      { label: "Revenue main stock (with margin)", value: mainRevenueWithMargin },
-      { label: "Revenue main stock (without margin)", value: mainRevenueWithoutMargin },
-      { label: "Revenue order stock (with margin)", value: orderRevenueWithMargin },
-      { label: "Revenue order stock (without margin)", value: orderRevenueWithoutMargin },
+    const fields: { label: string; value: string }[] = [
+      { label: "Main stock value", value: form.mainStockValue },
+      { label: "Order stock value", value: form.orderStockValue },
+      { label: "Revenue main stock (with margin)", value: form.mainRevenueWithMargin },
+      { label: "Revenue main stock (without margin)", value: form.mainRevenueWithoutMargin },
+      { label: "Revenue order stock (with margin)", value: form.orderRevenueWithMargin },
+      { label: "Revenue order stock (without margin)", value: form.orderRevenueWithoutMargin },
     ];
 
     for (const field of fields) {
@@ -89,14 +98,16 @@ export function CloseDaySheet({
     }
 
     try {
+      setLoading(true);
+
       const record = {
-        shopId: shopId || user.shopId as string,
-        mainStockValue: Number(fields[0].value),
-        orderStockValue: Number(fields[1].value),
-        revenueMainWithMargin: Number(fields[2].value),
-        revenueMainWithoutMargin: Number(fields[3].value),
-        revenueOrderWithMargin: Number(fields[4].value),
-        revenueOrderWithoutMargin: Number(fields[5].value),
+        shopId: shopId || (user.shopId as string),
+        mainStockValue: Number(form.mainStockValue),
+        orderStockValue: Number(form.orderStockValue),
+        revenueMainWithMargin: Number(form.mainRevenueWithMargin),
+        revenueMainWithoutMargin: Number(form.mainRevenueWithoutMargin),
+        revenueOrderWithMargin: Number(form.orderRevenueWithMargin),
+        revenueOrderWithoutMargin: Number(form.orderRevenueWithoutMargin),
         recordDate: formattedDate,
       };
 
@@ -106,8 +117,19 @@ export function CloseDaySheet({
       handleOpenChange(false);
     } catch (err: any) {
       toast.error(err.message || "Failed to save record");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const fieldsConfig = [
+    { key: "mainStockValue", label: "Main stock value", placeholder: "e.g. 12345.00" },
+    { key: "orderStockValue", label: "Order stock value", placeholder: "e.g. 5678.00" },
+    { key: "mainRevenueWithMargin", label: "Revenue main stock (with margin)", placeholder: "e.g. 8000.00" },
+    { key: "mainRevenueWithoutMargin", label: "Revenue main stock (without margin)", placeholder: "e.g. 7000.00" },
+    { key: "orderRevenueWithMargin", label: "Revenue order stock (with margin)", placeholder: "e.g. 4000.00" },
+    { key: "orderRevenueWithoutMargin", label: "Revenue order stock (without margin)", placeholder: "e.g. 3500.00" },
+  ];
 
   return (
     <Sheet open={internalOpen} onOpenChange={handleOpenChange}>
@@ -115,7 +137,7 @@ export function CloseDaySheet({
         <SheetTrigger asChild>
           <Button
             disabled={disabled}
-            className="disabled:opacity-50 w-50 transition text-[#f0f0f0] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[#414141]"
+            className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]"
           >
             Close the day
           </Button>
@@ -124,11 +146,11 @@ export function CloseDaySheet({
 
       <SheetContent
         side="right"
-        className="h-full flex flex-col bg-[#292929] border-black"
+        className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black"
       >
         <SheetHeader>
-          <SheetTitle className="text-xl text-[#f0f0f0]">Close the day</SheetTitle>
-          <SheetDescription className="flex flex-col text-lg text-[#b7b7b7]">
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Close the day</SheetTitle>
+          <SheetDescription className="flex flex-col text-lg text-[var(--color-text-secondary)]">
             <Label className="text-lg">Close the day for {formattedDate}</Label>
             {shopName && <Label className="text-base">{shopName}</Label>}
           </SheetDescription>
@@ -136,98 +158,34 @@ export function CloseDaySheet({
 
         {/* Inputs */}
         <div className="flex flex-col gap-4">
-          <div>
-            <Label htmlFor="mainStockValue" className="text-md text-[#f0f0f0] ml-6">
-              Main stock value:
-            </Label>
-            <Input
-              id="mainStockValue"
-              value={mainStockValue}
-              onChange={(e) => setMainStockValue(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 12345.00"
+          {fieldsConfig.map((field) => (
+            <SheetFormField
+              key={field.key}
+              id={field.key}
+              label={field.label}
+              value={form[field.key as keyof typeof form]}
+              onChange={(value) => handleChange(field.key as keyof typeof form, value)}
+              placeholder={field.placeholder}
             />
-          </div>
-
-          <div>
-            <Label htmlFor="orderStockValue" className="text-md text-[#f0f0f0] ml-6">
-              Order stock value:
-            </Label>
-            <Input
-              id="orderStockValue"
-              value={orderStockValue}
-              onChange={(e) => setOrderStockValue(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 5678.00"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="mainRevenueWithMargin" className="text-md text-[#f0f0f0] ml-6">
-              Revenue main stock (with margin):
-            </Label>
-            <Input
-              id="mainRevenueWithMargin"
-              value={mainRevenueWithMargin}
-              onChange={(e) => setMainRevenueWithMargin(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 8000.00"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="mainRevenueWithoutMargin" className="text-md text-[#f0f0f0] ml-6">
-              Revenue main stock (without margin):
-            </Label>
-            <Input
-              id="mainRevenueWithoutMargin"
-              value={mainRevenueWithoutMargin}
-              onChange={(e) => setMainRevenueWithoutMargin(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 7000.00"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="orderRevenueWithMargin" className="text-md text-[#f0f0f0] ml-6">
-              Revenue order stock (with margin):
-            </Label>
-            <Input
-              id="orderRevenueWithMargin"
-              value={orderRevenueWithMargin}
-              onChange={(e) => setOrderRevenueWithMargin(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 4000.00"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="orderRevenueWithoutMargin" className="text-md text-[#f0f0f0] ml-6">
-              Revenue order stock (without margin):
-            </Label>
-            <Input
-              id="orderRevenueWithoutMargin"
-              value={orderRevenueWithoutMargin}
-              onChange={(e) => setOrderRevenueWithoutMargin(e.target.value)}
-              className="w-[90%] mx-auto border-[#3f3e3e] text-[#f0f0f0]"
-              placeholder="e.g. 3500.00"
-            />
-          </div>
+          ))}
         </div>
-          <div className="mt-auto mb-4 flex flex-col w-[90%] mx-auto gap-2">
-            <Button
-              onClick={handleSave}
-              className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#414141]"
-            >
-              Save data
-            </Button>
-            <Button
-              onClick={handleReset}
-              className="transition text-[#f0f0f0] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[#414141]"
-            >
-              Reset
-            </Button>
-          </div>
+
+        {/* Buttons */}
+        <div className="mt-auto mb-4 flex flex-col w-[90%] mx-auto gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={loading}
+            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
+          >
+            {loading ? "Saving..." : "Save data"}
+          </Button>
+          <Button
+            onClick={handleReset}
+            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
+          >
+            Reset
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
