@@ -120,7 +120,7 @@ export function CloseDaySheet({
       handleOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save record");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

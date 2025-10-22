@@ -44,7 +44,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       if (user.role === "CEO") setAllRecords(data);
     } catch (err) {
       handleError(err);
-      router.replace("/login");
+      router.push("/login");
     }
   };
 
@@ -55,7 +55,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
     } catch (err) {
       handleError(err, "Failed to fetch shops");
-      router.replace("/login");
+      router.push("/login");
     }
   };
 
@@ -79,7 +79,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       setNotClosedShopNames(names);
     } catch (err) {
       handleError(err, "Error resolving not closed shops");
-      router.replace("/login");
+      router.push("/login");
     }
   };
 

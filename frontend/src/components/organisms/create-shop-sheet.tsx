@@ -75,7 +75,7 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
       handleReset();
     } catch (err) {
       handleError(err, "Failed to create shop");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

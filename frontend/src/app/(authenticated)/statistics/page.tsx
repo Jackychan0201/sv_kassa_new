@@ -58,7 +58,7 @@ export default function StatisticsPage() {
         }
       } catch (err) {
         handleError(err);
-        router.replace("/login");
+        router.push("/login");
       }
     }
     loadRecords();

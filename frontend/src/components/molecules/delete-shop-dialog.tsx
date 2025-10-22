@@ -39,7 +39,7 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
       setOpen(false);
     } catch (err: unknown) {
       handleError(err);
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

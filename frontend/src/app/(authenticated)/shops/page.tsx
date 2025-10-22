@@ -42,7 +42,7 @@ export default function ManageShopsPage() {
       setShops(filtered);
     } catch (err) {
       handleError(err);
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

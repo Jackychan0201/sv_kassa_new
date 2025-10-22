@@ -127,7 +127,7 @@ export function EditShopSheet({
       onOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save changes");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }
