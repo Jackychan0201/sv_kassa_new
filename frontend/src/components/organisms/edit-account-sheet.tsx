@@ -80,7 +80,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
       handleOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save account changes");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

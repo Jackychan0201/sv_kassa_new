@@ -55,7 +55,7 @@ export function GetTableDialog() {
           setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
         } catch (err) {
           handleError(err, "Failed to fetch shops");
-          router.replace("/login");
+          router.push("/login");
         }
       }
     };
@@ -96,7 +96,7 @@ export function GetTableDialog() {
       setRecords(filtered);
     } catch (err) {
       handleError(err, "Failed to fetch records");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

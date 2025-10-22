@@ -36,7 +36,7 @@ export function SVSidebar() {
     } catch (err) {
       handleError(err);
     } finally {
-      router.replace("/login");
+      router.push("/login");
     }
   };
 

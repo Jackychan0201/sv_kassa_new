@@ -55,7 +55,7 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
           );
         } catch (err) {
           handleError(err, "Failed to load shops");
-          router.replace("/login");
+          router.push("/login");
         }
       } else if (user.role === "SHOP" && user.shopId) {
         const shopData = {

@@ -96,7 +96,7 @@ export function GetChartDialog() {
           setSelectAll(true);
         } catch (err) {
           handleError(err, "Failed to load shops");
-          router.replace("/login");
+          router.push("/login");
         }
       }
     };
@@ -134,7 +134,7 @@ export function GetChartDialog() {
       setRecords(data);
     } catch (err) {
       handleError(err, "Failed to get data");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }

@@ -69,7 +69,7 @@ export function EditDaySheet({
       setRecord(shopRecord ? [shopRecord] : []);
     } catch (err) {
       handleError(err);
-      router.replace("/login");
+      router.push("/login");
     }
   };
 
@@ -143,7 +143,7 @@ export function EditDaySheet({
       if (formattedDate === formattedToday) onSaved?.();
     } catch (err) {
      handleError(err, "Failed to save record");
-     router.replace("/login");
+     router.push("/login");
     } finally {
       setLoading(false);
     }

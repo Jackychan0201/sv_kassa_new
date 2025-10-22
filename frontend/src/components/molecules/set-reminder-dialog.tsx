@@ -48,7 +48,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       toast.info("Timer is reset!");
     } catch (err) {
       handleError(err, "Failed to reset a reminder");
-      router.replace("/login");
+      router.push("/login");
     }
   };
 
@@ -62,7 +62,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       toast.success(`The timer is set to ${timeToSave}`);
     } catch (err) {
       handleError(err, "Failed to save reminder");
-      router.replace("/login");
+      router.push("/login");
     } finally {
       setOpen(false);
       onSaved?.();
