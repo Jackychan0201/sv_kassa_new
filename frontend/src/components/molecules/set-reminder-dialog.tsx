@@ -17,6 +17,7 @@ import { useUser } from "../providers/user-provider";
 import { Label } from "../atoms/label";
 import { Input } from "../atoms/input";
 import { saveReminderTime } from "@/lib/api";
+import { handleError } from "@/lib/utils";
 
 interface SetReminderDialogProps {
   onSaved?: () => void;
@@ -25,14 +26,14 @@ interface SetReminderDialogProps {
 export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
   const { user, setTimer } = useUser();
 
-  if (!user) return null;
-
-  const [selectedTime, setSelectedTime] = useState<string>(user.timer ?? "00:00");
+  const [selectedTime, setSelectedTime] = useState<string>(user?.timer ?? "00:00");
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setSelectedTime(user.timer ?? "00:00");
-  }, [user.timer]);
+    setSelectedTime(user?.timer ?? "00:00");
+  }, [user?.timer]);
+
+  if (!user) return null;
 
   const handleOpenChange = (isOpen: boolean) => setOpen(isOpen);
 
@@ -44,8 +45,8 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       await saveReminderTime(user.shopId, "00:00");
       setTimer("00:00");
       toast.info("Timer is reset!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to reset reminder");
+    } catch (err) {
+      handleError(err, "Failed to reset a reminder");
     }
   };
 
@@ -57,8 +58,8 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       await saveReminderTime(user.shopId, timeToSave);
       setTimer(timeToSave);
       toast.success(`The timer is set to ${timeToSave}`);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save reminder");
+    } catch (err) {
+      handleError(err, "Failed to save reminder");
     } finally {
       setOpen(false);
       onSaved?.();

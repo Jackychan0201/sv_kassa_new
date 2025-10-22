@@ -32,7 +32,6 @@ export function EditDaySheet({
   onClose,
   onSaved,
 }: EditDaySheetProps) {
-  const { user } = useUser();
   const [internalOpen, setInternalOpen] = useState(open);
   const [record, setRecord] = useState<DailyRecord[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -139,8 +138,8 @@ export function EditDaySheet({
       toast.success("Data saved successfully!");
       handleOpenChange(false);
       if (formattedDate === formattedToday) onSaved?.();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save record");
+    } catch (err) {
+     handleError(err, "Failed to save record");
     } finally {
       setLoading(false);
     }

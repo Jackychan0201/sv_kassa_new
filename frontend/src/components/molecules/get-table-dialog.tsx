@@ -91,8 +91,8 @@ export function GetTableDialog() {
       }
 
       setRecords(filtered);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to fetch records");
+    } catch (err) {
+      handleError(err, "Failed to fetch records");
     } finally {
       setLoading(false);
     }

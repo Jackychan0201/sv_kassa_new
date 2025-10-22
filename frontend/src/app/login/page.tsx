@@ -24,11 +24,19 @@ export default function LoginPage() {
     try {
       await login(email, password);
       router.push("/dashboard");
-    } catch (err: any) {
-      const error = err.message.split(",");
-      toast.error(error[0]);
+    } catch (err: unknown) {
+      let message = "Something went wrong.";
+
+      if (err instanceof Error) {
+        message = err.message.split(",")[0];
+      } else if (typeof err === "string") {
+        message = err.split(",")[0];
+      }
+
+      toast.error(message);
     }
   };
+
 
   return (
     <div className="bg-[var(--color-bg-main)] relative h-screen w-screen flex items-center justify-center">
