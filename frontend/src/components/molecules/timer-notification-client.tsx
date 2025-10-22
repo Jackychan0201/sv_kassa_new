@@ -5,5 +5,5 @@ import { useUser } from "@/components/providers/user-provider";
 
 export function TimerNotificationClient() {
   const { user } = useUser();
-  return <TimerNotification time={user.timer} />;
+  return <TimerNotification time={user?.timer || "00:00"} />;
 }
