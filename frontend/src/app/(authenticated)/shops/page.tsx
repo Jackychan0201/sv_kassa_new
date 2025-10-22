@@ -9,7 +9,7 @@ import { EditShopSheet } from "@/components/organisms/edit-shop-sheet";
 import { CreateShopSheet } from "@/components/organisms/create-shop-sheet";
 import { DeleteShopDialog } from "@/components/molecules/delete-shop-dialog";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Shop {
   id: string;

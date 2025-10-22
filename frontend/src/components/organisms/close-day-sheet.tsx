@@ -17,7 +17,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface CloseDaySheetProps {
   disabled?: boolean;

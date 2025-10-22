@@ -16,7 +16,7 @@ import { deleteShop } from "@/lib/api";
 import { Shop } from "@/lib/types";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface DeleteShopDialogProps {
   shop: Shop | null;

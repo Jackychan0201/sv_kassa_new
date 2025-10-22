@@ -16,7 +16,7 @@ import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { useUser } from "@/components/providers/user-provider";
 import { handleError } from "@/lib/utils";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface EditDaySheetProps {
   formattedDate: string;

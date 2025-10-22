@@ -18,7 +18,7 @@ import { Label } from "../atoms/label";
 import { Input } from "../atoms/input";
 import { saveReminderTime } from "@/lib/api";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface SetReminderDialogProps {
   onSaved?: () => void;

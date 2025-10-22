@@ -5,7 +5,7 @@ import { getRecordByDate, getAllShops, getShopById } from "@/lib/api";
 import { DailyRecord, Shop } from "@/lib/types";
 import { handleError } from "@/lib/utils";
 import { useUser } from "@/components/providers/user-provider";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface DashboardContextType {
   record: DailyRecord[] | null;

@@ -16,7 +16,7 @@ import {
 } from "@/components/atoms/accordion";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function StatisticsPage() {
   const { user } = useUser();
