@@ -7,8 +7,10 @@ export default registerAs('database', () => ({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+  schema: process.env.DB_SCHEMA || 'public',  
+  ssl: process.env.DB_SSL === 'true', 
   autoLoadEntities: true,
-  synchronize: true,
+  synchronize: process.env.NODE_ENV !== 'production',
   retryAttempts: 3,
   retryDelay: 3000,
 }));
