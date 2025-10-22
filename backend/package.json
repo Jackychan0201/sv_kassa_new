@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "nest build",
+    "build": "npx nest build",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check .",
