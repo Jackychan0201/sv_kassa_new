@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
  
 export function cn(...inputs: ClassValue[]) {
@@ -9,6 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 
 export function handleError(error: unknown, userMessage?: string) {
+  const router = useRouter();
   if (process.env.NODE_ENV === "development") {
     console.error(error);
   }
@@ -24,4 +26,6 @@ export function handleError(error: unknown, userMessage?: string) {
   const displayMessage = userMessage || message;
 
   toast.error(displayMessage);
+
+  router.replace("/login");
 }
