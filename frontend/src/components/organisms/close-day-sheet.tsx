@@ -17,6 +17,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface CloseDaySheetProps {
   disabled?: boolean;
@@ -38,6 +39,7 @@ export function CloseDaySheet({
   onClose,
 }: CloseDaySheetProps) {
   const { user } = useUser();
+  const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(open);
   const [loading, setLoading] = useState(false);
 
@@ -118,6 +120,7 @@ export function CloseDaySheet({
       handleOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save record");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

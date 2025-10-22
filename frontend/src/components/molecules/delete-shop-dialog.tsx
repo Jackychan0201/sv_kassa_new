@@ -16,6 +16,7 @@ import { deleteShop } from "@/lib/api";
 import { Shop } from "@/lib/types";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface DeleteShopDialogProps {
   shop: Shop | null;
@@ -26,6 +27,7 @@ interface DeleteShopDialogProps {
 export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleDelete = async () => {
     if (!shop) return;
@@ -37,6 +39,7 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
       setOpen(false);
     } catch (err: unknown) {
       handleError(err);
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

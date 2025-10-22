@@ -21,6 +21,7 @@ import {
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { Label } from "../atoms/label";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface CreateShopSheetProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface CreateShopSheetProps {
 }
 
 export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopSheetProps) {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -73,6 +75,7 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
       handleReset();
     } catch (err) {
       handleError(err, "Failed to create shop");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

@@ -16,6 +16,7 @@ import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { useUser } from "@/components/providers/user-provider";
 import { handleError } from "@/lib/utils";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
+import { useRouter } from "next/router";
 
 interface EditDaySheetProps {
   formattedDate: string;
@@ -32,6 +33,7 @@ export function EditDaySheet({
   onClose,
   onSaved,
 }: EditDaySheetProps) {
+  const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(open);
   const [record, setRecord] = useState<DailyRecord[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,6 +69,7 @@ export function EditDaySheet({
       setRecord(shopRecord ? [shopRecord] : []);
     } catch (err) {
       handleError(err);
+      router.replace("/login");
     }
   };
 
@@ -140,6 +143,7 @@ export function EditDaySheet({
       if (formattedDate === formattedToday) onSaved?.();
     } catch (err) {
      handleError(err, "Failed to save record");
+     router.replace("/login");
     } finally {
       setLoading(false);
     }

@@ -18,6 +18,7 @@ import { Label } from "../atoms/label";
 import { Input } from "../atoms/input";
 import { saveReminderTime } from "@/lib/api";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface SetReminderDialogProps {
   onSaved?: () => void;
@@ -25,7 +26,7 @@ interface SetReminderDialogProps {
 
 export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
   const { user, setTimer } = useUser();
-
+  const router = useRouter();
   const [selectedTime, setSelectedTime] = useState<string>(user?.timer ?? "00:00");
   const [open, setOpen] = useState(false);
 
@@ -47,6 +48,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       toast.info("Timer is reset!");
     } catch (err) {
       handleError(err, "Failed to reset a reminder");
+      router.replace("/login");
     }
   };
 
@@ -60,6 +62,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       toast.success(`The timer is set to ${timeToSave}`);
     } catch (err) {
       handleError(err, "Failed to save reminder");
+      router.replace("/login");
     } finally {
       setOpen(false);
       onSaved?.();

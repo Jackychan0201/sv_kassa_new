@@ -20,6 +20,7 @@ import {
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { Label } from "../atoms/label";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface Shop {
   id: string;
@@ -48,6 +49,7 @@ export function EditShopSheet({
   shop,
   onUpdate,
 }: EditShopSheetProps) {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -89,7 +91,6 @@ export function EditShopSheet({
 
   const handleSave = async () => {
     const { name, email, role, password, confirmPassword } = form;
-
     if (!name || !email) {
       toast.error("Name and email are required");
       return;
@@ -126,6 +127,7 @@ export function EditShopSheet({
       onOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save changes");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

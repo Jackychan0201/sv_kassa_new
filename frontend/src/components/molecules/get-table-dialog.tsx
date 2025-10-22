@@ -34,9 +34,11 @@ import {
   SelectValue,
 } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 export function GetTableDialog() {
   const { user } = useUser();
+  const router = useRouter();
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
   const [open, setOpen] = useState(false);
@@ -53,6 +55,7 @@ export function GetTableDialog() {
           setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
         } catch (err) {
           handleError(err, "Failed to fetch shops");
+          router.replace("/login");
         }
       }
     };
@@ -93,6 +96,7 @@ export function GetTableDialog() {
       setRecords(filtered);
     } catch (err) {
       handleError(err, "Failed to fetch records");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

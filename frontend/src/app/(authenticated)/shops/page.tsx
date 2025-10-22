@@ -9,6 +9,7 @@ import { EditShopSheet } from "@/components/organisms/edit-shop-sheet";
 import { CreateShopSheet } from "@/components/organisms/create-shop-sheet";
 import { DeleteShopDialog } from "@/components/molecules/delete-shop-dialog";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface Shop {
   id: string;
@@ -19,6 +20,7 @@ interface Shop {
 
 export default function ManageShopsPage() {
   const { user } = useUser();
+  const router = useRouter();
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
@@ -40,6 +42,7 @@ export default function ManageShopsPage() {
       setShops(filtered);
     } catch (err) {
       handleError(err);
+      router.replace("/login");
     } finally {
       setLoading(false);
     }
