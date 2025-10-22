@@ -21,7 +21,7 @@ import {
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { Label } from "../atoms/label";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface CreateShopSheetProps {
   open: boolean;

@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const chartOptions = [
   { key: "mainStockValue", label: "Main stock value" },

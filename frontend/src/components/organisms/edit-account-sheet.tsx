@@ -8,7 +8,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { updateShopAccount } from "@/lib/api";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { handleError } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface EditAccountSheetProps {
   open: boolean;
