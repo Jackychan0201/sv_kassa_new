@@ -16,6 +16,7 @@ import { postDailyRecord } from "@/lib/api";
 import { useUser } from "@/components/providers/user-provider";
 import { LoadingFallback } from "@/components/molecules/loading-fallback";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
+import { handleError } from "@/lib/utils";
 
 interface CloseDaySheetProps {
   disabled?: boolean;
@@ -115,8 +116,8 @@ export function CloseDaySheet({
       toast.success("Data saved successfully!");
       onSaved?.();
       handleOpenChange(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save record");
+    } catch (err) {
+      handleError(err, "Failed to save record");
     } finally {
       setLoading(false);
     }

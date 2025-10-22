@@ -1,7 +1,7 @@
 import { SidebarProvider } from "@/components/atoms/sidebar";
 import { SVSidebar } from "@/components/organisms/sv-sidebar";
 import DotGrid from "@/components/organisms/DotGrid";
-import { UserProvider, useUser } from "@/components/providers/user-provider";
+import { UserProvider } from "@/components/providers/user-provider";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { TimerNotificationClient } from "@/components/molecules/timer-notification-client";

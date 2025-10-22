@@ -202,7 +202,14 @@ export const deleteShop = async (shopId: string) => {
   return res.json();
 };
 
-export const updateShopAccount = async (shopId: string, data: Record<string, any>) => {
+interface UpdateShopAccountData {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: string;
+}
+
+export const updateShopAccount = async (shopId: string, data: UpdateShopAccountData) => {
   const res = await fetch(`/api/shops/${shopId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -217,3 +224,4 @@ export const updateShopAccount = async (shopId: string, data: Record<string, any
 
   return res.json();
 };
+

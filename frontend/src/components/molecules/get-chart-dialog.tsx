@@ -47,7 +47,7 @@ const chartOptions = [
   { key: "revenueMainWithoutMargin", label: "Revenue main stock (without margin)" },
   { key: "revenueOrderWithMargin", label: "Revenue order stock (with margin)" },
   { key: "revenueOrderWithoutMargin", label: "Revenue order stock (without margin)" },
-];
+] as const;
 
 const lineColors = [
   "#8884d8",
@@ -62,6 +62,12 @@ const lineColors = [
   "#4caf50",
 ];
 
+// ✅ Type-safe interface for merged data (CEO chart)
+interface MergedRecord {
+  recordDate: string;
+  [shopId: string]: string | number;
+}
+
 export function GetChartDialog() {
   const { user } = useUser();
   const [fromDate, setFromDate] = useState<Date | null>(null);
@@ -69,7 +75,9 @@ export function GetChartDialog() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [records, setRecords] = useState<DailyRecord[] | null>(null);
-  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<
+    (typeof chartOptions)[number]["key"] | null
+  >(null);
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShops, setSelectedShops] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -79,7 +87,9 @@ export function GetChartDialog() {
       if (user?.role === "CEO") {
         try {
           const data = await getAllShops();
-          const filtered = data.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name));
+          const filtered = data
+            .filter((s) => s.role === "SHOP")
+            .sort((a, b) => a.name.localeCompare(b.name));
           setShops(filtered);
           setSelectedShops(filtered.map((s) => s.id));
           setSelectAll(true);
@@ -120,8 +130,8 @@ export function GetChartDialog() {
     try {
       const data = await getRecordsByRange(formatDate(fromDate), formatDate(toDate));
       setRecords(data);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to fetch records");
+    } catch (err) {
+      handleError(err, "Failed to get data");
     } finally {
       setLoading(false);
     }
@@ -153,22 +163,23 @@ export function GetChartDialog() {
 
   const selectedOption = chartOptions.find((opt) => opt.key === selectedMetric);
 
-  let mergedData: any[] = [];
+  // ✅ FIXED: strongly typed version of mergedData
+  let mergedData: MergedRecord[] = [];
 
   if (records && selectedMetric) {
     if (user?.role === "CEO") {
       mergedData = Object.values(
         records.reduce((acc, rec) => {
           if (!acc[rec.recordDate]) acc[rec.recordDate] = { recordDate: rec.recordDate };
-          acc[rec.recordDate][rec.shopId] =
-            rec[selectedMetric as keyof DailyRecord] ?? 0;
+          const value = rec[selectedMetric] ?? 0;
+          acc[rec.recordDate][rec.shopId] = value;
           return acc;
-        }, {} as Record<string, Record<string, any>>)
+        }, {} as Record<string, MergedRecord>)
       );
     } else {
       mergedData = records.map((rec) => ({
         recordDate: rec.recordDate,
-        [selectedMetric]: rec[selectedMetric as keyof DailyRecord] ?? 0,
+        [selectedMetric]: rec[selectedMetric] ?? 0,
       }));
     }
   }
@@ -197,7 +208,9 @@ export function GetChartDialog() {
               <p className="text-sm mb-1">Select metric</p>
               <Select
                 value={selectedMetric ?? undefined}
-                onValueChange={(val) => setSelectedMetric(val)}
+                onValueChange={(val) =>
+                  setSelectedMetric(val as (typeof chartOptions)[number]["key"])
+                }
               >
                 <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
                   <SelectValue placeholder="Select metric" />
@@ -260,7 +273,10 @@ export function GetChartDialog() {
                 >
                   <div className="h-[35vh]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={mergedData} margin={{ bottom: 20, right: 10, top: 5 }}>
+                      <LineChart
+                        data={mergedData}
+                        margin={{ bottom: 20, right: 10, top: 5 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                           dataKey="recordDate"
@@ -312,7 +328,8 @@ export function GetChartDialog() {
                               <span
                                 className="w-3 h-3 rounded-full"
                                 style={{
-                                  backgroundColor: lineColors[idx % lineColors.length],
+                                  backgroundColor:
+                                    lineColors[idx % lineColors.length],
                                 }}
                               ></span>
                               <span>{shop.name}</span>
@@ -322,7 +339,6 @@ export function GetChartDialog() {
                     )}
                   </div>
                 </ChartContainer>
-
               </div>
             )}
             {!loading && records && records.length === 0 && (

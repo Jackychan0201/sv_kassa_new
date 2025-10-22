@@ -20,6 +20,7 @@ import {
 } from "@/components/atoms/select";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { Label } from "../atoms/label";
+import { handleError } from "@/lib/utils";
 
 interface CreateShopSheetProps {
   open: boolean;
@@ -70,8 +71,8 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
       onCreate();
       onOpenChange(false);
       handleReset();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create shop");
+    } catch (err) {
+      handleError(err, "Failed to create shop");
     } finally {
       setLoading(false);
     }

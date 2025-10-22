@@ -7,24 +7,31 @@ import { toast } from "sonner";
 import { useUser } from "@/components/providers/user-provider";
 import { updateShopAccount } from "@/lib/api";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
+import { handleError } from "@/lib/utils";
 
 interface EditAccountSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+interface UpdateAccountBody {
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
 export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) {
   const { user, setUser } = useUser();
 
-  if (!user) return null;
-
   const [form, setForm] = useState({
-    name: user.name,
-    email: user.email,
+    name: user?.name,
+    email: user?.email,
     password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+
+  if (!user) return null;
 
   const handleChange = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -60,7 +67,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
     try {
       setLoading(true);
 
-      const body: Record<string, any> = {};
+      const body: UpdateAccountBody = {};
       if (name !== user.name) body.name = name;
       if (email !== user.email) body.email = email;
       if (password.trim() !== "") body.password = password;
@@ -70,8 +77,8 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
 
       toast.success("Account updated successfully!");
       handleOpenChange(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save account changes");
+    } catch (err) {
+      handleError(err, "Failed to save account changes");
     } finally {
       setLoading(false);
     }
@@ -91,7 +98,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
           <SheetFormField
             id="name"
             label="Name"
-            value={form.name}
+            value={form?.name || ""}
             onChange={(val) => handleChange("name", val)}
             placeholder="Enter your name"
           />
@@ -100,7 +107,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
             id="email"
             label="Email"
             type="email"
-            value={form.email}
+            value={form?.email || ""}
             onChange={(val) => handleChange("email", val)}
             placeholder="Enter your email"
           />

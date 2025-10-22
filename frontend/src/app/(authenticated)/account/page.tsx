@@ -13,17 +13,16 @@ import { handleError } from "@/lib/utils";
 export default function AccountPage() {
   const { user } = useUser();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   if (!user) return <LoadingFallback message="Loading..." />;
-
-  const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
       router.push("/login");
-    } catch (err: any) {
-      handleError(err.message);
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 

@@ -19,6 +19,7 @@ import {
 } from "@/components/atoms/select";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { Label } from "../atoms/label";
+import { handleError } from "@/lib/utils";
 
 interface Shop {
   id: string;
@@ -32,6 +33,13 @@ interface EditShopSheetProps {
   onOpenChange: (open: boolean) => void;
   shop: Shop | null;
   onUpdate: (updatedShop: Shop) => void;
+}
+
+interface UpdateShopBody {
+  name?: string;
+  email?: string;
+  role?: string;
+  password?: string;
 }
 
 export function EditShopSheet({
@@ -94,7 +102,7 @@ export function EditShopSheet({
 
     try {
       setLoading(true);
-      const body: Record<string, any> = {};
+      const body: UpdateShopBody = {};
       if (name !== shop.name) body.name = name;
       if (email !== shop.email) body.email = email;
       if (role !== shop.role) body.role = role;
@@ -112,12 +120,12 @@ export function EditShopSheet({
         throw new Error(data.message || "Failed to update shop");
       }
 
-      const updated = await res.json();
+      const updated: Shop = await res.json();
       toast.success("Shop updated successfully!");
       onUpdate(updated);
       onOpenChange(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save changes");
+    } catch (err) {
+      handleError(err, "Failed to save changes");
     } finally {
       setLoading(false);
     }

@@ -15,6 +15,7 @@ import {
   AccordionTrigger,
 } from "@/components/atoms/accordion";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/atoms/select";
+import { handleError } from "@/lib/utils";
 
 export default function StatisticsPage() {
   const { user } = useUser();
@@ -53,8 +54,8 @@ export default function StatisticsPage() {
           const records = await getRecordsByRange(fromDateStr, toDateStr); 
           setAllRecords(records);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to load records");
+      } catch (err) {
+        handleError(err);
       }
     }
     loadRecords();

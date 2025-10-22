@@ -35,7 +35,7 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
       toast.success(`${shop.name} deleted successfully`);
       onDeleted?.();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleError(err);
     } finally {
       setLoading(false);
