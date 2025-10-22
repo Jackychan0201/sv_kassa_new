@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 const chartOptions = [
   { key: "mainStockValue", label: "Main stock value" },
@@ -62,7 +63,6 @@ const lineColors = [
   "#4caf50",
 ];
 
-// ✅ Type-safe interface for merged data (CEO chart)
 interface MergedRecord {
   recordDate: string;
   [shopId: string]: string | number;
@@ -70,6 +70,7 @@ interface MergedRecord {
 
 export function GetChartDialog() {
   const { user } = useUser();
+  const router = useRouter();
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
   const [open, setOpen] = useState(false);
@@ -95,6 +96,7 @@ export function GetChartDialog() {
           setSelectAll(true);
         } catch (err) {
           handleError(err, "Failed to load shops");
+          router.replace("/login");
         }
       }
     };
@@ -132,6 +134,7 @@ export function GetChartDialog() {
       setRecords(data);
     } catch (err) {
       handleError(err, "Failed to get data");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

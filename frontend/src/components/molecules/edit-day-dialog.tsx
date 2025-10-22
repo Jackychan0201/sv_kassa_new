@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface EditDayDialogProps {
   onSaved?: () => void;
@@ -33,6 +34,7 @@ interface EditDayDialogProps {
 
 export function EditDayDialog({ onSaved }: EditDayDialogProps) {
   const { user } = useUser();
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
@@ -53,6 +55,7 @@ export function EditDayDialog({ onSaved }: EditDayDialogProps) {
           );
         } catch (err) {
           handleError(err, "Failed to load shops");
+          router.replace("/login");
         }
       } else if (user.role === "SHOP" && user.shopId) {
         const shopData = {

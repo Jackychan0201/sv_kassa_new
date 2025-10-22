@@ -16,9 +16,11 @@ import {
 } from "@/components/atoms/accordion";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/atoms/select";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 export default function StatisticsPage() {
   const { user } = useUser();
+  const router = useRouter();
   const [dailyRecords, setDailyRecords] = useState<DailyRecord[] | null>(null);
   const [allRecords, setAllRecords] = useState<DailyRecord[] | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
@@ -56,6 +58,7 @@ export default function StatisticsPage() {
         }
       } catch (err) {
         handleError(err);
+        router.replace("/login");
       }
     }
     loadRecords();

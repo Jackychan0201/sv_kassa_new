@@ -25,7 +25,6 @@ import { handleError } from "@/lib/utils";
 
 export function SVSidebar() {
   const user = useUser();
-
   const router = useRouter();
   const pathname = usePathname();
   
@@ -34,9 +33,10 @@ export function SVSidebar() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push("/login");
     } catch (err) {
       handleError(err);
+    } finally {
+      router.replace("/login");
     }
   };
 

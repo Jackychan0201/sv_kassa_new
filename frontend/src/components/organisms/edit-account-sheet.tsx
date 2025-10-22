@@ -8,6 +8,7 @@ import { useUser } from "@/components/providers/user-provider";
 import { updateShopAccount } from "@/lib/api";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
 import { handleError } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 interface EditAccountSheetProps {
   open: boolean;
@@ -22,7 +23,7 @@ interface UpdateAccountBody {
 
 export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) {
   const { user, setUser } = useUser();
-
+  const router = useRouter();
   const [form, setForm] = useState({
     name: user?.name,
     email: user?.email,
@@ -79,6 +80,7 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
       handleOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save account changes");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { getRecordByDate, getAllShops, getShopById } from "@/lib/api";
 import { DailyRecord, Shop } from "@/lib/types";
 import { handleError } from "@/lib/utils";
 import { useUser } from "@/components/providers/user-provider";
+import { useRouter } from "next/router";
 
 interface DashboardContextType {
   record: DailyRecord[] | null;
@@ -26,6 +27,7 @@ export const useDashboard = () => {
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
+  const router = useRouter();
   const formattedDate = new Intl.DateTimeFormat("de-DE").format(new Date());
 
   const [record, setRecord] = useState<DailyRecord[] | null>(null);
@@ -42,6 +44,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       if (user.role === "CEO") setAllRecords(data);
     } catch (err) {
       handleError(err);
+      router.replace("/login");
     }
   };
 
@@ -52,6 +55,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
     } catch (err) {
       handleError(err, "Failed to fetch shops");
+      router.replace("/login");
     }
   };
 
@@ -75,6 +79,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       setNotClosedShopNames(names);
     } catch (err) {
       handleError(err, "Error resolving not closed shops");
+      router.replace("/login");
     }
   };
 

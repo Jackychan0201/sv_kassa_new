@@ -23,6 +23,7 @@ export default function AccountPage() {
       router.push("/login");
     } catch (err: unknown) {
       handleError(err);
+      router.replace("/login");
     }
   };
 
