@@ -10,7 +10,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
     "@types/bcrypt": "^6.0.0",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "typeorm": "^0.3.27"
   },
   "scripts": {
     "dev:backend": "cd backend && npm run start:dev",
