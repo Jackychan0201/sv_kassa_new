@@ -1,3 +1,4 @@
+// dashboard-provider.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
@@ -40,8 +41,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     try {
       const data = await getRecordByDate(formattedDate);
-      setRecord(data);
-      if (user.role === "CEO") setAllRecords(data);
+      setRecord(data || []);
+      if (user.role === "CEO") setAllRecords(data || []);
     } catch (err) {
       handleError(err);
       router.push("/login");
@@ -52,7 +53,11 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     if (!user || user.role !== "CEO") return;
     try {
       const allShops = await getAllShops();
-      setShops(allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
+      setShops(
+        allShops
+          .filter((s) => s.role === "SHOP")
+          .sort((a, b) => a.name.localeCompare(b.name))
+      );
     } catch (err) {
       handleError(err, "Failed to fetch shops");
       router.push("/login");
@@ -61,39 +66,39 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
   const resolveNotClosedShops = async () => {
     if (!user || user.role !== "CEO" || !allRecords || shops.length === 0) return;
-    try {
-      const closedShopIds = allRecords.map((r) => r.shopId);
-      const notClosedShops = shops.filter((s) => !closedShopIds.includes(s.id));
 
-      const names = await Promise.all(
-        notClosedShops.map(async (shop) => {
-          try {
-            const shopData = await getShopById(shop.id);
-            return shopData.name;
-          } catch (err) {
-            handleError(err, `Failed to fetch shop name for ${shop.id}:`);
-            return shop.id;
-          }
-        })
-      );
-      setNotClosedShopNames(names);
-    } catch (err) {
-      handleError(err, "Error resolving not closed shops");
-      router.push("/login");
-    }
+    const closedShopIds = allRecords.map((r) => r.shopId);
+    const notClosed = shops.filter((s) => !closedShopIds.includes(s.id));
+
+    const names = await Promise.all(
+      notClosed.map(async (shop) => {
+        try {
+          const shopData = await getShopById(shop.id);
+          return shopData.name;
+        } catch (err) {
+          handleError(err, `Failed to fetch shop name for ${shop.id}:`);
+          return shop.id;
+        }
+      })
+    );
+
+    setNotClosedShopNames(names);
   };
 
   const reloadData = () => {
-    loadShops();
+    if (!user) return;
+    if (user.role === "CEO") loadShops();
     loadRecord();
   };
 
   useEffect(() => {
     if (user) reloadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
     resolveNotClosedShops();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allRecords, shops]);
 
   return (

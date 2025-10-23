@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/atoms/button";
 import {
   Sheet,
@@ -10,37 +10,28 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/atoms/sheet";
-import { Label } from "@/components/atoms/label";
-import { toast } from "sonner";
-import { postDailyRecord } from "@/lib/api";
-import { useUser } from "@/components/providers/user-provider";
-import { LoadingFallback } from "@/components/molecules/loading-fallback";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/atoms/select";
 import { SheetFormField } from "@/components/molecules/sheet-form-field";
+import { toast } from "sonner";
+import { useUser } from "@/components/providers/user-provider";
+import { postDailyRecord, getAllShops } from "@/lib/api";
 import { handleError } from "@/lib/utils";
+import type { Shop } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 interface CloseDaySheetProps {
-  disabled?: boolean;
   formattedDate: string;
   onSaved?: () => void;
-  shopId?: string;
-  shopName?: string;
-  open?: boolean;         
-  onClose?: () => void; 
+  disabled?: boolean;
 }
 
-export function CloseDaySheet({
-  disabled,
-  formattedDate,
-  onSaved,
-  shopId,
-  shopName,
-  open = false,
-  onClose,
-}: CloseDaySheetProps) {
+export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDaySheetProps) {
   const { user } = useUser();
   const router = useRouter();
-  const [internalOpen, setInternalOpen] = useState(open);
+
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -52,11 +43,11 @@ export function CloseDaySheet({
     orderRevenueWithoutMargin: "",
   });
 
-  const handleOpenChange = (isOpen: boolean) => {
-    setInternalOpen(isOpen);
+  const handleSheetOpenChange = (isOpen: boolean) => {
+    setSheetOpen(isOpen);
     if (!isOpen) {
+      setSelectedShop(user?.role === "SHOP" && user.shopId ? { id: user.shopId, name: user.name || "My Shop", role: "SHOP" } : null);
       handleReset();
-      onClose?.();
     }
   };
 
@@ -72,10 +63,15 @@ export function CloseDaySheet({
   };
 
   const handleChange = (key: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
+    if (!selectedShop) {
+      toast.error("Please select a shop first");
+      return;
+    }
+
     const fields: { label: string; value: string }[] = [
       { label: "Main stock value", value: form.mainStockValue },
       { label: "Order stock value", value: form.orderStockValue },
@@ -96,15 +92,11 @@ export function CloseDaySheet({
       }
     }
 
-    if (!user) {
-      return <LoadingFallback message="Loading user info..." />;
-    }
-
     try {
       setLoading(true);
 
-      const record = {
-        shopId: shopId || (user.shopId as string),
+      await postDailyRecord({
+        shopId: selectedShop.id,
         mainStockValue: Number(form.mainStockValue),
         orderStockValue: Number(form.orderStockValue),
         revenueMainWithMargin: Number(form.mainRevenueWithMargin),
@@ -112,12 +104,11 @@ export function CloseDaySheet({
         revenueOrderWithMargin: Number(form.orderRevenueWithMargin),
         revenueOrderWithoutMargin: Number(form.orderRevenueWithoutMargin),
         recordDate: formattedDate,
-      };
+      });
 
-      await postDailyRecord(record);
       toast.success("Data saved successfully!");
+      handleSheetOpenChange(false);
       onSaved?.();
-      handleOpenChange(false);
     } catch (err) {
       handleError(err, "Failed to save record");
       router.push("/login");
@@ -125,6 +116,26 @@ export function CloseDaySheet({
       setLoading(false);
     }
   };
+
+  // Load shops for CEO
+  useEffect(() => {
+    const loadShops = async () => {
+      if (!user || !sheetOpen) return;
+
+      if (user.role === "CEO") {
+        try {
+          const allShops = await getAllShops();
+          setShops(allShops.filter(s => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
+        } catch (err) {
+          handleError(err, "Failed to load shops");
+        }
+      } else if (user.role === "SHOP" && user.shopId) {
+        setShops([{ id: user.shopId, name: user.name || "My Shop", role: "SHOP" }]);
+        setSelectedShop({ id: user.shopId, name: user.name || "My Shop", role: "SHOP" });
+      }
+    };
+    loadShops();
+  }, [sheetOpen, user]);
 
   const fieldsConfig = [
     { key: "mainStockValue", label: "Main stock value", placeholder: "e.g. 12345.00" },
@@ -136,56 +147,71 @@ export function CloseDaySheet({
   ];
 
   return (
-    <Sheet open={internalOpen} onOpenChange={handleOpenChange}>
-      {!open && (
-        <SheetTrigger asChild>
-          <Button
-            disabled={disabled}
-            className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]"
-          >
-            Close the day
-          </Button>
-        </SheetTrigger>
-      )}
+    <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
+      <SheetTrigger asChild>
+        <Button className="w-50 transition text-[var(--color-text-primary)] hover:scale-105 hover:bg-[var(--color-bg-select-hover)]">
+          Close the day
+        </Button>
+      </SheetTrigger>
 
-      <SheetContent
-        side="right"
-        className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black"
-      >
-        <SheetHeader>
+      <SheetContent side="right" className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-l border-[var(--color-border)] overflow-y-auto">
+        <SheetHeader className="pb-4 border-b border-[var(--color-border)]">
           <SheetTitle className="text-xl text-[var(--color-text-primary)]">Close the day</SheetTitle>
-          <SheetDescription className="flex flex-col text-lg text-[var(--color-text-secondary)]">
-            <Label className="text-lg">Close the day for {formattedDate}</Label>
-            {shopName && <Label className="text-base">{shopName}</Label>}
+          <SheetDescription className="text-[var(--color-text-secondary)]">
+            Close the day for {formattedDate} {selectedShop && `(${selectedShop.name})`}
           </SheetDescription>
         </SheetHeader>
 
-        {/* Inputs */}
-        <div className="flex flex-col gap-4">
-          {fieldsConfig.map((field) => (
+        {/* Shop selection for CEO */}
+        {user?.role === "CEO" && (
+          <div className="ml-6">
+            <p className="text-sm mb-2 text-[var(--color-text-primary)]">Select Shop</p>
+            <Select
+              value={selectedShop?.id ?? ""}
+              onValueChange={(val) => setSelectedShop(shops.find((s) => s.id === val) || null)}
+            >
+              <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] py-3 px-4">
+                <SelectValue placeholder="Choose a shop" />
+              </SelectTrigger>
+              <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
+                {shops.map((shop) => (
+                  <SelectItem key={shop.id} value={shop.id}>
+                    {shop.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Form fields */}
+        <div className="flex flex-col gap-4 py-6 border-t border-[var(--color-border)]">
+          {fieldsConfig.map(field => (
             <SheetFormField
               key={field.key}
               id={field.key}
               label={field.label}
-              value={form[field.key as keyof typeof form]}
-              onChange={(value) => handleChange(field.key as keyof typeof form, value)}
               placeholder={field.placeholder}
+              value={form[field.key as keyof typeof form]}
+              onChange={value => handleChange(field.key as keyof typeof form, value)}
+              disabled={!selectedShop}
             />
           ))}
         </div>
 
         {/* Buttons */}
-        <div className="mt-auto mb-4 flex flex-col w-[90%] mx-auto gap-2">
+        <div className="mt-auto flex flex-col gap-2 py-4 border-t border-[var(--color-border)]">
           <Button
             onClick={handleSave}
-            disabled={loading}
-            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
+            disabled={!selectedShop || loading || disabled}
+            className="w-[90%] mx-auto transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Saving..." : "Save data"}
+            {loading ? "Saving..." : "Save Data"}
           </Button>
           <Button
             onClick={handleReset}
-            className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
+            disabled={!selectedShop || disabled}
+            className="w-[90%] mx-auto transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
             Reset
           </Button>

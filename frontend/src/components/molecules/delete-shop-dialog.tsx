@@ -63,14 +63,14 @@ export function DeleteShopDialog({ shop, trigger, onDeleted }: DeleteShopDialogP
 
         <DialogFooter className="flex justify-end gap-2 mt-4">
           <DialogClose asChild>
-            <Button className="disabled:opacity-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]">
+            <Button className="disabled:opacity-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]">
               Cancel
             </Button>
           </DialogClose>
           <Button
             onClick={handleDelete}
             disabled={loading}
-            className="bg-red-500 hover:bg-red-600 w-20 transition text-[var(--color-text-primary)] delay-150 duration-300 hover:-translate-y-0 hover:scale-110 ease-in-out"
+            className="bg-red-500 hover:bg-red-600 w-20 transition text-[var(--color-text-primary)] delay-150 duration-300 hover:-translate-y-0 hover:scale-105 ease-in-out"
           >
             {loading ? "Deleting..." : "Delete"}
           </Button>

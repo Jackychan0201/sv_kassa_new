@@ -6,15 +6,15 @@ interface LoadingFallbackProps {
   height?: string | number;
 }
 
-export function LoadingFallback({ message = "Loading..." }: LoadingFallbackProps) {
+export function LoadingFallback({ message = "Loading...", height = "25vh" }: LoadingFallbackProps) {
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-main)] z-50"
-    >
+    <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-main)] w-full h-full">
       <div
-        className="border-5 border-black rounded-lg flex flex-col gap-y-5 items-center justify-center w-[20%] h-[20%] text-center text-[var(--color-text-primary)] animate-pulse">
-        <Label className="text-3xl">{message}</Label>
-        <Spinner className="size-10"/>
+        className="flex flex-col items-center justify-center gap-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-secondary)] p-6 shadow-md animate-pulse"
+        style={{ minHeight: height, minWidth: "300px" }}
+      >
+        <Label className="text-xl md:text-2xl text-[var(--color-text-primary)]">{message}</Label>
+        <Spinner className="w-12 h-12 text-[var(--color-text-primary)]" />
       </div>
     </div>
   );
