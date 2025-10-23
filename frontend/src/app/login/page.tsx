@@ -18,9 +18,12 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setIsLoading(true);
     try {
       await login(email, password);
       router.push("/dashboard");
@@ -34,9 +37,10 @@ export default function LoginPage() {
       }
 
       toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
   };
-
 
   return (
     <div className="bg-[var(--color-bg-main)] relative h-screen w-screen flex items-center justify-center">
@@ -70,6 +74,7 @@ export default function LoginPage() {
               value={email}
               onChange={setEmail}
               placeholder="Enter your email"
+              disabled={isLoading}
             />
             <LoginFormField
               id="password"
@@ -78,13 +83,17 @@ export default function LoginPage() {
               value={password}
               onChange={setPassword}
               placeholder="Enter your password"
+              disabled={isLoading}
             />
 
             <Button
               type="submit"
-              className="w-[60%] transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)] self-center mt-4"
+              disabled={isLoading}
+              className={`w-[60%] transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out self-center mt-4
+                ${isLoading ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"}
+              `}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>

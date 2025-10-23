@@ -11,9 +11,10 @@ interface LoginFormFieldProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
-export function LoginFormField({ id, label, type = "text", value, onChange, placeholder, className }: LoginFormFieldProps) {
+export function LoginFormField({ id, label, type = "text", value, onChange, placeholder, className, disabled }: LoginFormFieldProps) {
   return (
     <div className="grid gap-1">
       <Label className="text-[var(--color-text-primary)]" htmlFor={id}>
@@ -26,6 +27,7 @@ export function LoginFormField({ id, label, type = "text", value, onChange, plac
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={`w-full text-[var(--color-text-primary)] border-[var(--color-border-sheet)] ${className || ""}`}
+        disabled={disabled}
       />
     </div>
   );

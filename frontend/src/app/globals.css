@@ -16,8 +16,8 @@
   --color-button-bg-hover-type1: #363636;
   --color-button-bg-hover-type2: #646464;
 
-  --color-sidebar-button-active: #555555;
-  --color-sidebar-button-hover: #969696;
+  --color-sidebar-button-active: #787878;
+  --color-sidebar-button-hover: #555555;
 
   --color-border: #3a3a3a;
   --color-border-sheet: #3f3e3e;
@@ -28,6 +28,7 @@
   --color-text-thirdly: #8f8f8f;
 
   --color-caution: #ff4d4d;
+  --color-caution-hover: #ff2c2c;
   
   --color-calendar-today: #a4a4a4;
   --color-calendar-disabled: #101010;

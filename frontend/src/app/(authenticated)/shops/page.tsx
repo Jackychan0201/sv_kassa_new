@@ -10,6 +10,8 @@ import { CreateShopSheet } from "@/components/organisms/create-shop-sheet";
 import { DeleteShopDialog } from "@/components/molecules/delete-shop-dialog";
 import { handleError } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { SidebarInset, SidebarTrigger } from "@/components/atoms/sidebar";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/molecules/card";
 
 interface Shop {
   id: string;
@@ -24,7 +26,7 @@ export default function ManageShopsPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const fetchShops = useCallback(async () => {
@@ -57,7 +59,7 @@ export default function ManageShopsPage() {
 
   const handleEditClick = (shop: Shop) => {
     setSelectedShop(shop);
-    setOpen(true);
+    setEditOpen(true);
   };
 
   const handleUpdateShop = async (updatedShop: Shop) => {
@@ -68,60 +70,70 @@ export default function ManageShopsPage() {
   };
 
   return (
-    <div className="flex flex-col">
-      <Label className="text-3xl font-bold mb-1">Manage Shops</Label>
-      <Label className="text-lg text-[var(--color-text-primary)] mb-6">
-        View, edit, or create shop accounts below.
-      </Label>
+    <SidebarInset className="bg-[var(--color-bg-main)] text-[var(--color-text-primary)]">
+      {/* HEADER */}
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--color-border)] px-4 bg-[var(--color-bg-secondary)]">
+        <SidebarTrigger className="-ml-1 text-[var(--color-text-primary)]" />
+        <div className="flex flex-col">
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Manage Shops</h1>
+          <p className="text-xs text-[var(--color-text-thirdly)]">
+            View, edit, or create shop accounts
+          </p>
+        </div>
+      </header>
 
-      <div className="flex flex-col gap-y-3">
-        {shops.map((shop) => (
-          <div
-            key={shop.id}
-            className="flex max-w-1/3 items-center justify-between bg-[var(--color-bg-secondary)] rounded-lg p-4 border border-[var(--color-border)]"
-          >
-            <div className="flex flex-col">
-              <Label className="text-lg text-[var(--color-text-primary)]">{shop.name}</Label>
-              <Label className="text-sm text-[var(--color-text-secondary)]">{shop.email}</Label>
-              <Label className="text-sm text-[var(--color-text-thirdly)]">
-                Role: {shop.role}
-              </Label>
-            </div>
-
-            <div className="flex flex-row gap-x-4">
-              <Button
-                onClick={() => handleEditClick(shop)}
-                className="text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] transition ease-in-out hover:scale-105"
-              >
-                Edit
-              </Button>
-
-              <DeleteShopDialog
-                shop={shop}
-                onDeleted={fetchShops}
-                trigger={
-                  <Button className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-caution)]">
-                    Delete
+      {/* CONTENT */}
+      <div className="flex flex-1 flex-col gap-6 p-6">
+        {/* SHOPS GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {shops.map((shop) => (
+            <Card
+              key={shop.id}
+              className="border border-[var(--color-border)] bg-[var(--color-bg-secondary)]"
+            >
+              <CardHeader>
+                <CardTitle className="text-lg text-[var(--color-text-primary)]">
+                  {shop.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="text-sm text-[var(--color-text-secondary)]">Email: {shop.email}</div>
+                <div className="text-sm text-[var(--color-text-thirdly)]">Role: {shop.role}</div>
+                <div className="flex gap-3 mt-4">
+                  <Button
+                    onClick={() => handleEditClick(shop)}
+                    className="text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] transition ease-in-out hover:scale-105"
+                  >
+                    Edit
                   </Button>
-                }
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-row mt-6 gap-x-5">
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-110 hover:bg-[var(--color-bg-select-hover)]"
-        >
-          Create New Shop
-        </Button>
+                  <DeleteShopDialog
+                    shop={shop}
+                    onDeleted={fetchShops}
+                    trigger={
+                      <Button className="transition text-[var(--color-text-primary)] hover:bg-[var(--color-caution)] hover:scale-105">
+                        Delete
+                      </Button>
+                    }
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* CREATE SHOP BUTTON */}
+        <div className="flex justify-start">
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
+          >
+            Create New Shop
+          </Button>
+        </div>
       </div>
 
       <EditShopSheet
-        open={open}
-        onOpenChange={setOpen}
+        open={editOpen}
+        onOpenChange={setEditOpen}
         shop={selectedShop}
         onUpdate={handleUpdateShop}
       />
@@ -131,6 +143,6 @@ export default function ManageShopsPage() {
         onOpenChange={setCreateOpen}
         onCreate={fetchShops}
       />
-    </div>
+    </SidebarInset>
   );
 }

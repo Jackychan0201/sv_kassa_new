@@ -36,7 +36,7 @@ export default async function AuthenticatedLayout({
           <SVSidebar />
 
           <div className="absolute inset-0 z-0">
-            <DotGrid
+            {/* <DotGrid
               dotSize={4}
               gap={35}
               baseColor="#666666"
@@ -46,10 +46,10 @@ export default async function AuthenticatedLayout({
               shockStrength={10}
               resistance={750}
               returnDuration={1.5}
-            />
+            /> */}
           </div>
 
-          <div className="relative z-10 ml-45 mt-3 text-[var(--color-text-primary)] w-full">
+          <div className="relative z-10 text-[var(--color-text-primary)] w-full">
             {children}
             <TimerNotificationClient />
           </div>
