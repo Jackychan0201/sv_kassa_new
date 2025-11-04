@@ -92,12 +92,12 @@ export function EditShopSheet({
   const handleSave = async () => {
     const { name, email, role, password, confirmPassword } = form;
     if (!name || !email) {
-      toast.error("Name and email are required");
+      toast.error("Название и email обязательны");
       return;
     }
 
     if (password && password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Пароли не совпадают");
       return;
     }
 
@@ -118,15 +118,15 @@ export function EditShopSheet({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || "Failed to update shop");
+        throw new Error(data.message || "Не удалось сохранить изменения");
       }
 
       const updated: Shop = await res.json();
-      toast.success("Shop updated successfully!");
+      toast.success("Данные обновлены успешно!");
       onUpdate(updated);
       onOpenChange(false);
     } catch (err) {
-      handleError(err, "Failed to save changes");
+      handleError(err, "Не удалось сохранить изменения");
       router.push("/login");
     } finally {
       setLoading(false);
@@ -141,20 +141,20 @@ export function EditShopSheet({
       >
         <SheetHeader>
           <SheetTitle className="text-xl text-[var(--color-text-primary)]">
-            Edit Shop Data
+            Редактировать Данные Магазина
           </SheetTitle>
           <SheetDescription className="text-lg text-[var(--color-text-secondary)]">
-            Modify this shop’s name, email, role, or password.
+            Изменение названия магазина, email, роли или пароля
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 mt-4">
           <SheetFormField
             id="name"
-            label="Name"
+            label="Название"
             value={form.name}
             onChange={(val) => handleChange("name", val)}
-            placeholder="Enter shop name"
+            placeholder="Введите название магазина"
           />
 
           <SheetFormField
@@ -162,17 +162,17 @@ export function EditShopSheet({
             label="Email"
             value={form.email}
             onChange={(val) => handleChange("email", val)}
-            placeholder="Enter email"
+            placeholder="Введите email"
             type="email"
           />
 
           <div>
             <Label htmlFor="role" className="text-md text-[var(--color-text-primary)] ml-6">
-              Role:
+              Роль:
             </Label>
             <Select value={form.role} onValueChange={(val) => handleChange("role", val)}>
               <SelectTrigger className="w-[90%] mx-auto justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]">
-                <SelectValue placeholder="Select role" />
+                <SelectValue placeholder="Выберите роль" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                 <SelectItem value="SHOP">SHOP</SelectItem>
@@ -183,19 +183,19 @@ export function EditShopSheet({
 
           <SheetFormField
             id="password"
-            label="New Password"
+            label="Новый Пароль"
             value={form.password}
             onChange={(val) => handleChange("password", val)}
-            placeholder="Enter new password"
+            placeholder="Введите новый пароль"
             type="password"
           />
 
           <SheetFormField
             id="confirmPassword"
-            label="Confirm New Password"
+            label="Подтвердите Новый Пароль"
             value={form.confirmPassword}
             onChange={(val) => handleChange("confirmPassword", val)}
-            placeholder="Confirm new password"
+            placeholder="Подтвердите новый пароль"
             type="password"
           />
         </div>
@@ -206,13 +206,13 @@ export function EditShopSheet({
             disabled={loading}
             className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Saving..." : "Save Changes"}
+            {loading ? "Сохранение..." : "Сохранить изменения"}
           </Button>
           <Button
             onClick={handleReset}
             className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
-            Reset
+            Сброс
           </Button>
         </div>
       </SheetContent>

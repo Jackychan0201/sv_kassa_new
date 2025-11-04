@@ -18,12 +18,12 @@ function DashboardContent() {
   const { record, allRecords, shops, notClosedShopNames, selectedShopId, setSelectedShopId, reloadData } =
     useDashboard()
 
-  const formattedDate = new Intl.DateTimeFormat("de-DE").format(new Date())
+  const formattedDate = new Intl.DateTimeFormat("ru-RU").format(new Date())
 
-  if (!user) return <LoadingFallback message="Loading user info..." />
+  if (!user) return <LoadingFallback message="Загрузка пользователя..." />
 
   // Fix endless loading for SHOP
-  if (user.role === "SHOP" && record === null) return <LoadingFallback message="Loading records..." />
+  if (user.role === "SHOP" && record === null) return <LoadingFallback message="Загрузка данных..." />
 
   const filteredRecords: DailyRecord[] =
     user.role === "SHOP"
@@ -58,17 +58,17 @@ function DashboardContent() {
 
   if (user.role === "SHOP") {
     const isClosed = recordData[0] !== null
-    dayStatusLabel = isClosed ? "Day is closed successfully!" : "Day is not closed!"
+    dayStatusLabel = isClosed ? "Смена закрыта успешно!" : "Смена не закрыта!"
     dayStatusColor = isClosed ? "text-[#009908]" : "text-[#960000]"
   } else if (user.role === "CEO") {
     if (!allRecords) {
-      dayStatusLabel = "Loading daily records..."
+      dayStatusLabel = "Загрузка данных..."
       dayStatusColor = "text-[var(--color-text-thirdly)]"
     } else if (notClosedShopNames.length === 0) {
-      dayStatusLabel = "All shops closed their days"
+      dayStatusLabel = "Все магазины закрыли смену"
       dayStatusColor = "text-[#009908]"
     } else {
-      dayStatusLabel = `Not all shops closed their days: ${notClosedShopNames.join(", ")}`
+      dayStatusLabel = `Не все магазины закрыли смену: ${notClosedShopNames.join(", ")}`
       dayStatusColor = "text-[#960000]"
     }
   }
@@ -76,12 +76,12 @@ function DashboardContent() {
   const closeDayDisabled = user.role === "SHOP" ? recordData[0] !== null : notClosedShopNames.length === 0
 
   const metrics = [
-    { label: "Main Stock Value", value: recordData[0], icon: Package },
-    { label: "Order Stock Value", value: recordData[1], icon: Package },
-    { label: "Revenue Main (No Margin)", value: recordData[2], icon: DollarSign },
-    { label: "Revenue Main (With Margin)", value: recordData[3], icon: TrendingUp },
-    { label: "Revenue Order (No Margin)", value: recordData[4], icon: DollarSign },
-    { label: "Revenue Order (With Margin)", value: recordData[5], icon: TrendingUp },
+    { label: "Остатки ОСН", value: recordData[0], icon: Package },
+    { label: "Остатки ДОП", value: recordData[1], icon: Package },
+    { label: "Продажи ОСН (Без Маржи)", value: recordData[2], icon: DollarSign },
+    { label: "Продажи ОСН (С Маржой)", value: recordData[3], icon: TrendingUp },
+    { label: "Продажи ДОП (Без Маржи)", value: recordData[4], icon: DollarSign },
+    { label: "Продажи ДОП (С Маржой)", value: recordData[5], icon: TrendingUp },
   ]
 
   return (
@@ -90,8 +90,8 @@ function DashboardContent() {
       <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--color-border)] px-4 bg-[var(--color-bg-secondary)]">
         <SidebarTrigger className="-ml-1 text-[var(--color-text-primary)]" />
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Dashboard</h1>
-          <p className="text-xs text-[var(--color-text-thirdly)]">Today is: {formattedDate}</p>
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Домашняя</h1>
+          <p className="text-xs text-[var(--color-text-thirdly)]">Сегодня: {formattedDate}</p>
         </div>
       </header>
 
@@ -100,10 +100,10 @@ function DashboardContent() {
         {/* CEO Shop Selector */}
         {user.role === "CEO" && (
           <div>
-            <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Select Shop</Label>
+            <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Выберите магазин</Label>
             <Select value={selectedShopId} onValueChange={setSelectedShopId}>
               <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
-                <SelectValue placeholder="Select shop" />
+                <SelectValue placeholder="Выберите магазин" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
                 <SelectItem value="ALL">ALL</SelectItem>

@@ -48,12 +48,12 @@ export function SVSidebar() {
   };
 
   const links = [
-    { key: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { key: "statistics", label: "Statistics", href: "/statistics", icon: BarChart3 },
+    { key: "dashboard", label: "Домашняя", href: "/dashboard", icon: LayoutDashboard },
+    { key: "statistics", label: "Статистика", href: "/statistics", icon: BarChart3 },
   ];
 
   if (user.user.role === "CEO") {
-    links.push({ key: "shops", label: "Manage Shops", href: "/shops", icon: Store });
+    links.push({ key: "shops", label: "Магазины", href: "/shops", icon: Store });
   }
 
   return (
@@ -61,7 +61,7 @@ export function SVSidebar() {
       {/* HEADER */}
       <SidebarHeader className="flex justify-center h-16 border-b border-[var(--color-border)] px-6 py-4 bg-[var(--color-bg-secondary)]">
         <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
-          Navigation
+          Навигация
         </h2>
       </SidebarHeader>
 
@@ -137,7 +137,7 @@ export function SVSidebar() {
                     className="flex items-center gap-2 cursor-pointer text-[var(--color-text-primary)] hover:bg-[var(--color-sidebar-button-hover)] hover:text-[var(--color-text-primary)] transition-colors px-3 py-2"
                   >
                     <User className="h-4 w-4 text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)]" />
-                    <span>Account Settings</span>
+                    <span>Настройки Профиля</span>
                   </Link>
                 </DropdownMenuItem>
 
@@ -146,7 +146,7 @@ export function SVSidebar() {
                   className="flex items-center gap-2 cursor-pointer text-[var(--color-caution)] hover:bg-[var(--color-sidebar-button-hover)] hover:text-[var(--color-text-primary)] transition-colors px-3 py-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
+                  <span>Выход</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

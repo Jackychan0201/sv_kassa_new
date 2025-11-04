@@ -58,23 +58,23 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
     const { name, email, password, confirmPassword, role } = form;
 
     if (!name || !email || !password) {
-      toast.error("All fields are required");
+      toast.error("Все поля обязательны для заполнения");
       return;
     }
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Пароли не совпадают");
       return;
     }
 
     try {
       setLoading(true);
       await createShop({ name, email, password, role });
-      toast.success("Shop created successfully!");
+      toast.success("Магазин создан успешно!");
       onCreate();
       onOpenChange(false);
       handleReset();
     } catch (err) {
-      handleError(err, "Failed to create shop");
+      handleError(err, "Не удалось создать магазин");
       router.push("/login");
     } finally {
       setLoading(false);
@@ -88,19 +88,19 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
         className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black"
       >
         <SheetHeader>
-          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Create New Shop</SheetTitle>
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Создать Новый Магазин</SheetTitle>
           <SheetDescription className="text-lg text-[var(--color-text-secondary)]">
-            Add a new shop account to your system.
+            Добвать новый магазин в вашу систему.
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 mt-4">
           <SheetFormField
             id="name"
-            label="Name"
+            label="Название"
             value={form.name}
             onChange={(val) => handleChange("name", val)}
-            placeholder="Enter shop name"
+            placeholder="Введите название магазина"
           />
 
           <SheetFormField
@@ -108,12 +108,12 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
             label="Email"
             value={form.email}
             onChange={(val) => handleChange("email", val)}
-            placeholder="Enter email"
+            placeholder="Введите email"
             type="email"
           />
 
           <div>
-            <Label htmlFor="role" className="text-md text-[var(--color-text-primary)] ml-6">Role:</Label>
+            <Label htmlFor="role" className="text-md text-[var(--color-text-primary)] ml-6">Роль:</Label>
             <Select
               value={form.role}
               onValueChange={(value) => handleChange("role", value)}
@@ -130,19 +130,19 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
 
           <SheetFormField
             id="password"
-            label="Password"
+            label="Пароль"
             value={form.password}
             onChange={(val) => handleChange("password", val)}
-            placeholder="Enter password"
+            placeholder="Введите пароль"
             type="password"
           />
 
           <SheetFormField
             id="confirmPassword"
-            label="Confirm Password"
+            label="Подтвердите Пароль"
             value={form.confirmPassword}
             onChange={(val) => handleChange("confirmPassword", val)}
-            placeholder="Confirm password"
+            placeholder="Подтвердите пароль"
             type="password"
           />
         </div>
@@ -153,7 +153,7 @@ export function CreateShopSheet({ open, onOpenChange, onCreate }: CreateShopShee
             disabled={loading}
             className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Creating..." : "Create Shop"}
+            {loading ? "Создание..." : "Создать магазин"}
           </Button>
         </div>
       </SheetContent>

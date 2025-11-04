@@ -56,12 +56,12 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
     const { name, email, password, confirmPassword } = form;
 
     if (!name || !email) {
-      toast.error("Name and email are required");
+      toast.error("Название и email обязательны");
       return;
     }
 
     if (password && password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Пароли не совпадают");
       return;
     }
 
@@ -76,10 +76,10 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
       const updated = await updateShopAccount(user.shopId, body);
       setUser({ ...user, ...updated });
 
-      toast.success("Account updated successfully!");
+      toast.success("Данные редактированы успешно!");
       handleOpenChange(false);
     } catch (err) {
-      handleError(err, "Failed to save account changes");
+      handleError(err, "Не удалось редактировать данные");
       router.push("/login");
     } finally {
       setLoading(false);
@@ -90,19 +90,19 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="right" className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-black">
         <SheetHeader>
-          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Edit Account Data</SheetTitle>
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Редактировать Данные Магазина</SheetTitle>
           <SheetDescription className="text-lg text-[var(--color-text-secondary)]">
-            Update your personal and login information
+            Обновление личной информации и данных для входа
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 mt-4">
           <SheetFormField
             id="name"
-            label="Name"
+            label="Название"
             value={form?.name || ""}
             onChange={(val) => handleChange("name", val)}
-            placeholder="Enter your name"
+            placeholder="Введите название"
           />
 
           <SheetFormField
@@ -111,25 +111,25 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
             type="email"
             value={form?.email || ""}
             onChange={(val) => handleChange("email", val)}
-            placeholder="Enter your email"
+            placeholder="Введите email"
           />
 
           <SheetFormField
             id="password"
-            label="New Password"
+            label="Новый Пароль"
             type="password"
             value={form.password}
             onChange={(val) => handleChange("password", val)}
-            placeholder="Enter new password"
+            placeholder="Введите новый пароль"
           />
 
           <SheetFormField
             id="confirmPassword"
-            label="Confirm New Password"
+            label="Подтвердите Новый Пароль"
             type="password"
             value={form.confirmPassword}
             onChange={(val) => handleChange("confirmPassword", val)}
-            placeholder="Confirm new password"
+            placeholder="Подтвердите новый пароль"
           />
         </div>
 
@@ -139,13 +139,13 @@ export function EditAccountSheet({ open, onOpenChange }: EditAccountSheetProps) 
             disabled={loading}
             className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Saving..." : "Save changes"}
+            {loading ? "Сохранение..." : "Сохранить изменения"}
           </Button>
           <Button
             onClick={handleReset}
             className="transition text-[var(--color-text-primary)] delay-50 duration-200 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"
           >
-            Reset
+            Сбррос
           </Button>
         </div>
       </SheetContent>

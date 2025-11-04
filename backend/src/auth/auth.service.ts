@@ -26,7 +26,7 @@ export class AuthService {
     const passwordMatch = await bcrypt.compare(password, hashToCompare);
 
     if (!shop || !passwordMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Неправильный email или пароль');
     }
 
     const payload = {

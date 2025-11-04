@@ -66,7 +66,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
               .sort((a, b) => a.name.localeCompare(b.name))
           )
         } catch (err) {
-          handleError(err, "Failed to load shops")
+          handleError(err, "Не удалось загрузить магазины")
           router.push("/login")
         }
       } else if (user.role === "SHOP" && user.shopId) {
@@ -155,7 +155,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
 
   const handleSave = async () => {
     if (!selectedDate || !selectedShop) {
-      toast.error("Please select date and shop first.")
+      toast.error("Пожалуйста, выберите дату и магазин")
       return
     }
 
@@ -168,7 +168,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
     try {
       for (const [key, value] of Object.entries(form)) {
         if (value.trim() !== "" && isNaN(Number(value))) {
-          toast.error(`${key} must be a valid number`)
+          toast.error(`${key} должны быть числом`)
           return
         }
       }
@@ -198,11 +198,11 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
         })
       }
 
-      toast.success("Data saved successfully!")
+      toast.success("Данные сохранены успешно!")
       handleSheetOpenChange(false)
       if (formattedDate === formattedToday) onSaved?.()
     } catch (err) {
-      handleError(err, "Failed to save record")
+      handleError(err, "Не удалось сохранить данные")
       router.push("/login")
     } finally {
       setLoading(false)
@@ -210,19 +210,19 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
   }
 
   const inputFields = [
-    { key: "mainStockValue", label: "Main stock value", placeholder: "e.g. 12345.00" },
-    { key: "orderStockValue", label: "Order stock value", placeholder: "e.g. 5678.00" },
-    { key: "mainRevenueWithMargin", label: "Revenue main stock (with margin)", placeholder: "e.g. 8000.00" },
-    { key: "mainRevenueWithoutMargin", label: "Revenue main stock (without margin)", placeholder: "e.g. 7000.00" },
-    { key: "orderRevenueWithMargin", label: "Revenue order stock (with margin)", placeholder: "e.g. 4000.00" },
-    { key: "orderRevenueWithoutMargin", label: "Revenue order stock (without margin)", placeholder: "e.g. 3500.00" },
+    { key: "mainStockValue", label: "Остатки ОСН", placeholder: "e.g. 12345.00" },
+    { key: "orderStockValue", label: "Остатки ДОП", placeholder: "e.g. 5678.00" },
+    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
+    { key: "mainRevenueWithoutMargin", label: "Продажи ОСН (Без Маржи)", placeholder: "e.g. 7000.00" },
+    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
+    { key: "orderRevenueWithoutMargin", label: "Продажи ДОП (Без Маржи)", placeholder: "e.g. 3500.00" },
   ] as const
 
   return (
     <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
       <SheetTrigger asChild>
         <Button className="w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:scale-105 hover:bg-[var(--color-bg-select-hover)]">
-          Edit Data
+          Редактировать данные
         </Button>
       </SheetTrigger>
 
@@ -231,9 +231,9 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
         className="flex flex-col h-full bg-[var(--color-bg-secondary)] border-l border-[var(--color-border)] overflow-y-auto"
       >
         <SheetHeader className="pb-4 border-b border-[var(--color-border)]">
-          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Edit Daily Data</SheetTitle>
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Редактировать данные смены</SheetTitle>
           <SheetDescription className="text-[var(--color-text-primary)]">
-            Choose a date and shop to load or edit data.
+            Выберите дату и магазин для редактирования данных.
           </SheetDescription>
         </SheetHeader>
 
@@ -242,7 +242,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
           <div className="flex flex-col gap-4">
             <div className="flex items-center py-0 ml-6 gap-x-15 text-[var(--color-text-primary)]">
               <DatePicker
-                title="Select Date"
+                title="Выберите дату"
                 value={selectedDate}
                 onChange={setSelectedDate}
               />
@@ -250,13 +250,13 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
 
             {user?.role === "CEO" && (
               <div className="ml-6">
-                <p className="text-sm mb-2 text-[var(--color-text-primary)]">Select Shop</p>
+                <p className="text-sm mb-2 text-[var(--color-text-primary)]">Выберите магазин</p>
                 <Select
                   value={selectedShop?.id ?? ""}
                   onValueChange={(val) => setSelectedShop(shops.find((s) => s.id === val) || null)}
                 >
                   <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] py-3 px-4">
-                    <SelectValue placeholder="Choose a shop" />
+                    <SelectValue placeholder="Выберите магазин" />
                   </SelectTrigger>
                   <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
                     {shops.map((shop) => (
@@ -295,14 +295,14 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
             disabled={!selectedDate || !selectedShop || loading}
             className="w-[90%] transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Saving..." : "Save Data"}
+            {loading ? "Сохранение..." : "Сохранить данные"}
           </Button>
           <Button
             onClick={handleReset}
             disabled={!selectedDate || !selectedShop}
             className="w-[90%] transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            Reset
+            Сброс
           </Button>
         </div>
       </SheetContent>
