@@ -47,7 +47,11 @@ function Calendar({
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          date.toLocaleString("ru-RU", { month: "short" }),
+        formatWeekdayName: (date, options) =>
+        date.toLocaleDateString("ru-RU", { 
+          weekday:  "short" 
+        }),
         ...formatters,
       }}
       classNames={{

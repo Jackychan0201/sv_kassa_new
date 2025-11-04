@@ -68,26 +68,26 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
 
   const handleSave = async () => {
     if (!selectedShop) {
-      toast.error("Please select a shop first");
+      toast.error("Пожалуйста, выберите магазин");
       return;
     }
 
     const fields: { label: string; value: string }[] = [
-      { label: "Main stock value", value: form.mainStockValue },
-      { label: "Order stock value", value: form.orderStockValue },
-      { label: "Revenue main stock (with margin)", value: form.mainRevenueWithMargin },
-      { label: "Revenue main stock (without margin)", value: form.mainRevenueWithoutMargin },
-      { label: "Revenue order stock (with margin)", value: form.orderRevenueWithMargin },
-      { label: "Revenue order stock (without margin)", value: form.orderRevenueWithoutMargin },
+      { label: "Остатки ОСН", value: form.mainStockValue },
+      { label: "Остатки ДОП", value: form.orderStockValue },
+      { label: "Продажи ОСН (С Маржой)", value: form.mainRevenueWithMargin },
+      { label: "Продажи ОСН (Без Маржи)", value: form.mainRevenueWithoutMargin },
+      { label: "Продажи ДОП (С Маржой)", value: form.orderRevenueWithMargin },
+      { label: "Продажи ДОП (Без Маржи)", value: form.orderRevenueWithoutMargin },
     ];
 
     for (const field of fields) {
       if (field.value.trim() === "") {
-        toast.error(`${field.label} cannot be empty`);
+        toast.error(`${field.label} не может быть пустым`);
         return;
       }
       if (isNaN(Number(field.value))) {
-        toast.error(`${field.label} must be a valid number`);
+        toast.error(`${field.label} должны быть числом`);
         return;
       }
     }
@@ -106,11 +106,11 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
         recordDate: formattedDate,
       });
 
-      toast.success("Data saved successfully!");
+      toast.success("Данные сохранены успешно!");
       handleSheetOpenChange(false);
       onSaved?.();
     } catch (err) {
-      handleError(err, "Failed to save record");
+      handleError(err, "Не удалось сохранить данные");
       router.push("/login");
     } finally {
       setLoading(false);
@@ -127,7 +127,7 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
           const allShops = await getAllShops();
           setShops(allShops.filter(s => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
         } catch (err) {
-          handleError(err, "Failed to load shops");
+          handleError(err, "Не удалось загрузить магазины");
         }
       } else if (user.role === "SHOP" && user.shopId) {
         setShops([{ id: user.shopId, name: user.name || "My Shop", role: "SHOP" }]);
@@ -138,40 +138,40 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
   }, [sheetOpen, user]);
 
   const fieldsConfig = [
-    { key: "mainStockValue", label: "Main stock value", placeholder: "e.g. 12345.00" },
-    { key: "orderStockValue", label: "Order stock value", placeholder: "e.g. 5678.00" },
-    { key: "mainRevenueWithMargin", label: "Revenue main stock (with margin)", placeholder: "e.g. 8000.00" },
-    { key: "mainRevenueWithoutMargin", label: "Revenue main stock (without margin)", placeholder: "e.g. 7000.00" },
-    { key: "orderRevenueWithMargin", label: "Revenue order stock (with margin)", placeholder: "e.g. 4000.00" },
-    { key: "orderRevenueWithoutMargin", label: "Revenue order stock (without margin)", placeholder: "e.g. 3500.00" },
+    { key: "mainStockValue", label: "Остатки ОСН", placeholder: "e.g. 12345.00" },
+    { key: "orderStockValue", label: "Остатки ДОП", placeholder: "e.g. 5678.00" },
+    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
+    { key: "mainRevenueWithoutMargin", label: "Продажи ОСН (Без Маржи)", placeholder: "e.g. 7000.00" },
+    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
+    { key: "orderRevenueWithoutMargin", label: "Продажи ДОП (Без Маржи)", placeholder: "e.g. 3500.00" },
   ];
 
   return (
     <Sheet open={sheetOpen} onOpenChange={handleSheetOpenChange}>
       <SheetTrigger asChild>
         <Button className="w-50 transition text-[var(--color-text-primary)] hover:scale-105 hover:bg-[var(--color-bg-select-hover)]">
-          Close the day
+          Закрыть смену
         </Button>
       </SheetTrigger>
 
       <SheetContent side="right" className="h-full flex flex-col bg-[var(--color-bg-secondary)] border-l border-[var(--color-border)] overflow-y-auto">
         <SheetHeader className="pb-4 border-b border-[var(--color-border)]">
-          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Close the day</SheetTitle>
+          <SheetTitle className="text-xl text-[var(--color-text-primary)]">Закрыть смену</SheetTitle>
           <SheetDescription className="text-[var(--color-text-secondary)]">
-            Close the day for {formattedDate} {selectedShop && `(${selectedShop.name})`}
+            Закрыть смену за {formattedDate} {selectedShop && `(${selectedShop.name})`}
           </SheetDescription>
         </SheetHeader>
 
         {/* Shop selection for CEO */}
         {user?.role === "CEO" && (
           <div className="ml-6">
-            <p className="text-sm mb-2 text-[var(--color-text-primary)]">Select Shop</p>
+            <p className="text-sm mb-2 text-[var(--color-text-primary)]">Выберите магазин</p>
             <Select
               value={selectedShop?.id ?? ""}
               onValueChange={(val) => setSelectedShop(shops.find((s) => s.id === val) || null)}
             >
               <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] py-3 px-4">
-                <SelectValue placeholder="Choose a shop" />
+                <SelectValue placeholder="Выберите магазин" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
                 {shops.map((shop) => (
@@ -206,14 +206,14 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
             disabled={!selectedShop || loading || disabled}
             className="w-[90%] mx-auto transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            {loading ? "Saving..." : "Save Data"}
+            {loading ? "Сохранение..." : "Сохранить данные"}
           </Button>
           <Button
             onClick={handleReset}
             disabled={!selectedShop || disabled}
             className="w-[90%] mx-auto transition text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            Reset
+            Сброс
           </Button>
         </div>
       </SheetContent>

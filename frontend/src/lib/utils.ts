@@ -8,9 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 
 export function handleError(error: unknown, userMessage?: string) {
-  if (process.env.NODE_ENV === "development") {
-    console.error(error);
-  }
+
 
   let message = "Something went wrong. Please try again.";
 

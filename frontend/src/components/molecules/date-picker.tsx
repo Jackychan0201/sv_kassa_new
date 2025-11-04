@@ -46,12 +46,12 @@ export function DatePicker({ title, value, onChange }: DatePickerProps) {
             className="w-48 text-[var(--color-text-primary)] justify-between font-normal hover:bg-[var(--color-bg-select-hover)]"
           >
             {selectedDate
-              ? selectedDate.toLocaleDateString("de-DE", {
+              ? selectedDate.toLocaleDateString("ru-RU", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
                 })
-              : "Select date"}
+              : "Выберите дату"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>

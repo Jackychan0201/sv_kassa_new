@@ -35,7 +35,7 @@ export default function ManageShopsPage() {
     try {
       setLoading(true);
       const res = await fetch("/api/shops", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch shops");
+      if (!res.ok) throw new Error("Не удалось получить данные");
 
       const data: Shop[] = await res.json();
       const filtered = data
@@ -54,8 +54,8 @@ export default function ManageShopsPage() {
     fetchShops();
   }, [fetchShops]);
 
-  if (!user) return <LoadingFallback message="Loading user..." />;
-  if (loading) return <LoadingFallback message="Loading shops..." />;
+  if (!user) return <LoadingFallback message="Загрузка данных пользователя..." />;
+  if (loading) return <LoadingFallback message="Загрузка данных магазинов..." />;
 
   const handleEditClick = (shop: Shop) => {
     setSelectedShop(shop);
@@ -75,9 +75,9 @@ export default function ManageShopsPage() {
       <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--color-border)] px-4 bg-[var(--color-bg-secondary)]">
         <SidebarTrigger className="-ml-1 text-[var(--color-text-primary)]" />
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Manage Shops</h1>
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Управление Магазинами</h1>
           <p className="text-xs text-[var(--color-text-thirdly)]">
-            View, edit, or create shop accounts
+            Управление магазинами: просмотр, редактирование, создание и удаление
           </p>
         </div>
       </header>
@@ -98,20 +98,20 @@ export default function ManageShopsPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="text-sm text-[var(--color-text-secondary)]">Email: {shop.email}</div>
-                <div className="text-sm text-[var(--color-text-thirdly)]">Role: {shop.role}</div>
+                <div className="text-sm text-[var(--color-text-thirdly)]">Роль: {shop.role}</div>
                 <div className="flex gap-3 mt-4">
                   <Button
                     onClick={() => handleEditClick(shop)}
                     className="text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] transition ease-in-out hover:scale-105"
                   >
-                    Edit
+                    Редактировать
                   </Button>
                   <DeleteShopDialog
                     shop={shop}
                     onDeleted={fetchShops}
                     trigger={
                       <Button className="transition text-[var(--color-text-primary)] hover:bg-[var(--color-caution)] hover:scale-105">
-                        Delete
+                        Удалить
                       </Button>
                     }
                   />
@@ -126,7 +126,7 @@ export default function ManageShopsPage() {
             onClick={() => setCreateOpen(true)}
             className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
           >
-            Create New Shop
+            Создать Новый Магазин
           </Button>
         </div>
       </div>

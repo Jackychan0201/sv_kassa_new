@@ -1,71 +1,125 @@
 import { DailyRecord, Shop } from "@/lib/types";
+import { handleError } from "@/lib/utils";
 
 export const login = async (username: string, password: string) => {
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: username, password }),
-    credentials: "include", 
-  });
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: username, password }),
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Login failed");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Login failed";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Login failed");
+    throw error;
   }
-
-  return res.json();
 };
 
 export const logout = async () => {
-  const res = await fetch("/api/auth/logout", {
-    method: "POST",
-    credentials: "include", 
-  });
+  try {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    throw new Error("Logout failed");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Logout failed";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Logout failed");
+    throw error;
   }
-
-  return res.json();
 };
 
 export const getDailyRecords = async (): Promise<DailyRecord[]> => {
-  const res = await fetch("/api/daily-records", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
+  try {
+    const res = await fetch("/api/daily-records", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
 
-  if (!res.ok) throw new Error("Failed to fetch daily records");
-  return res.json();
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to fetch daily records";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to fetch daily records");
+    throw error;
+  }
 };
 
 export const getRecordByDate = async (date: string): Promise<DailyRecord[]> => {
-  const res = await fetch(
-    `/api/daily-records/by-date?fromDate=${date}&toDate=${date}`,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    }
-  );
+  try {
+    const res = await fetch(
+      `/api/daily-records/by-date?fromDate=${date}&toDate=${date}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
 
-  if (!res.ok) throw new Error("Failed to fetch daily record");
-  return res.json();
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to fetch daily record";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to fetch daily record");
+    throw error;
+  }
 };
 
 export const getRecordsByRange = async (fromDate: string, toDate: string): Promise<DailyRecord[]> => {
-  const res = await fetch(
-    `/api/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}`,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    }
-  );
+  try {
+    const res = await fetch(
+      `/api/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      }
+    );
 
-  if (!res.ok) throw new Error("Failed to fetch daily records by range");
-  return res.json();
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to fetch daily records by range";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to fetch daily records by range");
+    throw error;
+  }
 };
 
 
@@ -78,19 +132,27 @@ export const updateDailyRecord = async (record: {
   revenueOrderWithMargin: number;
   revenueOrderWithoutMargin: number;
 }) => {
-  const res = await fetch(`/api/daily-records/${record.id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(record),
-  });
+  try {
+    const res = await fetch(`/api/daily-records/${record.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(record),
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Failed to update daily record");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to update daily record";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to update daily record");
+    throw error;
   }
-
-  return res.json();
 }
 
 export const postDailyRecord = async (record: {
@@ -103,65 +165,98 @@ export const postDailyRecord = async (record: {
   revenueOrderWithoutMargin: number;
   recordDate: string;
 }) => {
-  const res = await fetch("/api/daily-records", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(record),
-  });
+  try {
+    const res = await fetch("/api/daily-records", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(record),
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Failed to save daily record");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to save daily record";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to save daily record");
+    throw error;
   }
-
-  return res.json();
 };
 
 export const saveReminderTime = async (shopId: string, time: string) => {
-  const res = await fetch(`/api/shops/${shopId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ id: shopId, timer: time }),
-  });
+  try {
+    const res = await fetch(`/api/shops/${shopId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ id: shopId, timer: time }),
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Failed to save reminder");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to save reminder";
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to save reminder");
+    throw error;
   }
-
-  return res.json();
 };
 
 export const getShopById = async (id: string): Promise<Shop> => {
-  const res = await fetch(`/api/shops/${id}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(`/api/shops/${id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch shop with id ${id}`);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || `Failed to fetch shop with id ${id}`;
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, `Failed to fetch shop with id ${id}`);
+    throw error;
   }
-
-  return res.json();
 };
 
 
 export const getAllShops = async (): Promise<Shop[]> => {
-  const res = await fetch('/api/shops', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
+  try {
+    const res = await fetch('/api/shops', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || 'Failed to fetch shops');
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || 'Failed to fetch shops';
+      const err = new Error(message);
+      handleError(err, message);
+      throw err;
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, 'Failed to fetch shops');
+    throw error;
   }
-
-  return res.json();
 };
 
 export const createShop = async (shop: {
@@ -170,36 +265,44 @@ export const createShop = async (shop: {
   password: string;
   role?: string;
 }) => {
+  try {
+    const res = await fetch('/api/shops', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(shop),
+    });
 
-  const res = await fetch('/api/shops', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify(shop),
-  });
-  
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || 'Failed to create shop';
+      handleError(message);
+    }
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || 'Failed to create shop');
+    return res.json();
+  } catch (error) {
+    handleError(error, 'Failed to create shop');
   }
-
-  return res.json();
 };
 
 export const deleteShop = async (shopId: string) => {
-  const res = await fetch(`/api/shops/${shopId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
+  try {
+    const res = await fetch(`/api/shops/${shopId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || 'Failed to delete shop');
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || 'Failed to delete shop';
+      handleError(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, 'Failed to delete shop');
   }
-
-  return res.json();
 };
 
 interface UpdateShopAccountData {
@@ -210,18 +313,23 @@ interface UpdateShopAccountData {
 }
 
 export const updateShopAccount = async (shopId: string, data: UpdateShopAccountData) => {
-  const res = await fetch(`/api/shops/${shopId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(data),
-  });
+  try {
+    const res = await fetch(`/api/shops/${shopId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
 
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Failed to update account");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => null);
+      const message = (errorData && errorData.message) || "Failed to update account";
+      handleError(message);
+    }
+
+    return res.json();
+  } catch (error) {
+    handleError(error, "Failed to update account");
   }
-
-  return res.json();
 };
 

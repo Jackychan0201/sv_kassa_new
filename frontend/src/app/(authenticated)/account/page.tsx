@@ -16,7 +16,7 @@ export default function AccountPage() {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
-  if (!user) return <LoadingFallback message="Loading..." />;
+  if (!user) return <LoadingFallback message="Загрузка..." />;
 
   const handleLogout = async () => {
     try {
@@ -34,9 +34,9 @@ export default function AccountPage() {
       <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--color-border)] px-4 bg-[var(--color-bg-secondary)]">
         <SidebarTrigger className="-ml-1 text-[var(--color-text-primary)]" />
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Account</h1>
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Профиль</h1>
           <p className="text-xs text-[var(--color-text-thirdly)]">
-            Manage your profile and preferences
+            Управление вашей учетной записью
           </p>
         </div>
       </header>
@@ -46,10 +46,10 @@ export default function AccountPage() {
         {/* ACCOUNT INFO CARD */}
         <Card className="border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
           <CardHeader>
-            <CardTitle className="text-lg">Profile Information</CardTitle>
+            <CardTitle className="text-lg">Информация о Профиле</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="text-sm text-[var(--color-text-primary)]">Name: {user.name}</div>
+            <div className="text-sm text-[var(--color-text-primary)]">Название: {user.name}</div>
             <div className="text-sm text-[var(--color-text-primary)]">Email: {user.email}</div>
           </CardContent>
         </Card>
@@ -60,14 +60,14 @@ export default function AccountPage() {
             onClick={() => setEditOpen(true)}
             className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)]"
           >
-            Change Account Data
+            Редактировать Профиль
           </Button>
 
           <Button
             onClick={handleLogout}
             className="transition bg-[var(--color-caution)] text-[var(--color-text-primary)] hover:bg-[var(--color-caution-hover)]"
           >
-            Logout
+            Выход
           </Button>
         </div>
       </div>

@@ -22,12 +22,12 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 
 const chartOptions = [
-  { key: "mainStockValue", label: "Main stock value" },
-  { key: "orderStockValue", label: "Order stock value" },
-  { key: "revenueMainWithMargin", label: "Revenue main stock (with margin)" },
-  { key: "revenueMainWithoutMargin", label: "Revenue main stock (without margin)" },
-  { key: "revenueOrderWithMargin", label: "Revenue order stock (with margin)" },
-  { key: "revenueOrderWithoutMargin", label: "Revenue order stock (without margin)" },
+  { key: "mainStockValue", label: "Остатки ОСН" },
+  { key: "orderStockValue", label: "Остатки ДОП" },
+  { key: "revenueMainWithMargin", label: "Продажи ОСН (С Маржой)" },
+  { key: "revenueMainWithoutMargin", label: "Продажи ОСН (Без Маржи)" },
+  { key: "revenueOrderWithMargin", label: "Продажи ДОП (С Маржой)" },
+  { key: "revenueOrderWithoutMargin", label: "Продажи ДОП (Без Маржи)" },
 ] as const
 
 const lineColors = [
@@ -113,7 +113,7 @@ export default function StatisticsPage() {
 
   const handleTableFetch = async () => {
     if (!tableFromDate || !tableToDate) {
-      toast.error("Please select both From and To dates")
+      toast.error("Пожалуйста выберите обе даты От и До")
       return
     }
 
@@ -129,7 +129,7 @@ export default function StatisticsPage() {
 
       setTableRecords(filtered)
     } catch (err) {
-      handleError(err, "Failed to fetch records")
+      handleError(err, "Не удалось получить данные")
       router.push("/login")
     } finally {
       setTableLoading(false)
@@ -138,11 +138,11 @@ export default function StatisticsPage() {
 
   const handleChartFetch = async () => {
     if (!chartFromDate || !chartToDate) {
-      toast.error("Please select both From and To dates")
+      toast.error("Пожалуйста выберите обе даты От и До")
       return
     }
     if (!selectedMetric) {
-      toast.error("Please select a chart metric")
+      toast.error("Пожалуйста выберите метрику")
       return
     }
 
@@ -151,7 +151,7 @@ export default function StatisticsPage() {
       const data = await getRecordsByRange(formatDate(chartFromDate), formatDate(chartToDate))
       setChartRecords(data)
     } catch (err) {
-      handleError(err, "Failed to get data")
+      handleError(err, "Не удалось получить данные")
       router.push("/login")
     } finally {
       setChartLoading(false)
@@ -160,7 +160,7 @@ export default function StatisticsPage() {
 
   const handleSelectAll = (checked: boolean) => {
     if (!checked && selectedShops.length === 1) {
-      toast.error("At least one shop must be selected")
+      toast.error("Как минимум должен быть выбран один магазин")
       return
     }
 
@@ -171,7 +171,7 @@ export default function StatisticsPage() {
 
   const toggleShop = (id: string, checked: boolean) => {
     if (!checked && selectedShops.length === 1) {
-      toast.error("At least one shop must be selected")
+      toast.error("Как минимум должен быть выбран один магазин")
       return
     }
 
@@ -182,10 +182,10 @@ export default function StatisticsPage() {
     }
   }
 
-  if (!user) return <LoadingFallback message="Loading user info..." />
+  if (!user) return <LoadingFallback message="Загрузка данных пользователя..." />
   if (error) return <Label className="text-red-500">Error: {error}</Label>
-  if (!dailyRecords && user.role === "SHOP") return <LoadingFallback message="Loading records..." />
-  if (!allRecords && user.role === "CEO") return <LoadingFallback message="Loading records for all shops..." />
+  if (!dailyRecords && user.role === "SHOP") return <LoadingFallback message="Загрузка данных..." />
+  if (!allRecords && user.role === "CEO") return <LoadingFallback message="Загрузка данных магазинов..." />
 
   let recordsToUse: DailyRecord[] = []
   if (user.role === "SHOP") {
@@ -199,7 +199,7 @@ export default function StatisticsPage() {
   }
 
   if (recordsToUse.length === 0) {
-    return <Label>No records found in the selected date range.</Label>
+    return <Label>В данном периоде данных не обнаружено.</Label>
   }
 
   const calculateGMROI = (records: DailyRecord[]) => {
@@ -304,36 +304,36 @@ export default function StatisticsPage() {
   }
 
   const adviceList: string[] = []
-  if (gmroi < 1.0) adviceList.push(`GMROI: Critical (Current: ${gmroi.toFixed(2)}). Losing money on inventory.`)
-  else if (gmroi < 2.0) adviceList.push(`GMROI: Warning (Current: ${gmroi.toFixed(2)}). Consider markdown strategies.`)
-  else if (gmroi < 3.0) adviceList.push(`GMROI: Good (Current: ${gmroi.toFixed(2)}). Maintain current strategies.`)
-  else adviceList.push(`GMROI: Excellent (Current: ${gmroi.toFixed(2)}). Scale successful practices.`)
+  if (gmroi < 1.0) adviceList.push(`GMROI: Критический (Текущий: ${gmroi.toFixed(2)}). Убытки от запасов.`)
+  else if (gmroi < 2.0) adviceList.push(`GMROI: Предупреждение (Текущий: ${gmroi.toFixed(2)}). Рассмотрите стратегии уценки.`)
+  else if (gmroi < 3.0) adviceList.push(`GMROI: Хорошо (Текущий: ${gmroi.toFixed(2)}). Сохраняйте текущие стратегии.`)
+  else adviceList.push(`GMROI: Отлично (Текущий: ${gmroi.toFixed(2)}). Масштабируйте успешные практики.`)
 
   if (dailyRevenueGrowth > 20 || dailyRevenueGrowth < -20)
-    adviceList.push(`Daily Revenue Growth: Volatile (Current: ${dailyRevenueGrowth.toFixed(2)}%).`)
+    adviceList.push(`Ежедневный рост выручки: Волатильный (Текущий: ${dailyRevenueGrowth.toFixed(2)}%).`)
   else if (dailyRevenueGrowth >= 5)
-    adviceList.push(`Daily Revenue Growth: Excellent (Current: ${dailyRevenueGrowth.toFixed(2)}%).`)
+    adviceList.push(`Ежедневный рост выручки: Отличный (Текущий: ${dailyRevenueGrowth.toFixed(2)}%).`)
   else if (dailyRevenueGrowth >= 2)
-    adviceList.push(`Daily Revenue Growth: Good (Current: ${dailyRevenueGrowth.toFixed(2)}%).`)
+    adviceList.push(`Ежедневный рост выручки: Хороший (Текущий: ${dailyRevenueGrowth.toFixed(2)}%).`)
   else if (dailyRevenueGrowth >= -2)
-    adviceList.push(`Daily Revenue Growth: Stable (Current: ${dailyRevenueGrowth.toFixed(2)}%).`)
+    adviceList.push(`Ежедневный рост выручки: Стабильный (Текущий: ${dailyRevenueGrowth.toFixed(2)}%).`)
   else if (dailyRevenueGrowth >= -5)
-    adviceList.push(`Daily Revenue Growth: Warning (Current: ${dailyRevenueGrowth.toFixed(2)}%).`)
+    adviceList.push(`Ежедневный рост выручки: Предупреждение (Текущий: ${dailyRevenueGrowth.toFixed(2)}%).`)
 
-  if (inventoryTurnover > 12) adviceList.push(`Inventory Turnover: High (Current: ${inventoryTurnover.toFixed(2)}).`)
+  if (inventoryTurnover > 12) adviceList.push(`Оборачиваемость запасов: Высокая (Текущая: ${inventoryTurnover.toFixed(2)}).`)
   else if (inventoryTurnover >= 8)
-    adviceList.push(`Inventory Turnover: Excellent (Current: ${inventoryTurnover.toFixed(2)}).`)
+    adviceList.push(`Оборачиваемость запасов: Отличная (Текущая: ${inventoryTurnover.toFixed(2)}).`)
   else if (inventoryTurnover >= 5)
-    adviceList.push(`Inventory Turnover: Good (Current: ${inventoryTurnover.toFixed(2)}).`)
+    adviceList.push(`Оборачиваемость запасов: Хорошая (Текущая: ${inventoryTurnover.toFixed(2)}).`)
   else if (inventoryTurnover >= 3)
-    adviceList.push(`Inventory Turnover: Average (Current: ${inventoryTurnover.toFixed(2)}).`)
-  else adviceList.push(`Inventory Turnover: Poor (Current: ${inventoryTurnover.toFixed(2)}).`)
+    adviceList.push(`Оборачиваемость запасов: Средняя (Текущая: ${inventoryTurnover.toFixed(2)}).`)
+  else adviceList.push(`Оборачиваемость запасов: Низкая (Текущая: ${inventoryTurnover.toFixed(2)}).`)
 
-  if (overallMargin < 25) adviceList.push(`Overall Margin: Warning (Current: ${overallMargin.toFixed(2)}%).`)
+  if (overallMargin < 25) adviceList.push(`Общая маржа: Предупреждение (Текущая: ${overallMargin.toFixed(2)}%).`)
   else if (overallMargin < 30.9)
-    adviceList.push(`Overall Margin: Industry Average (Current: ${overallMargin.toFixed(2)}%).`)
-  else if (overallMargin < 50) adviceList.push(`Overall Margin: Good (Current: ${overallMargin.toFixed(2)}%).`)
-  else adviceList.push(`Overall Margin: Excellent (Current: ${overallMargin.toFixed(2)}%).`)
+    adviceList.push(`Общая маржа: Средняя по отрасли (Текущая: ${overallMargin.toFixed(2)}%).`)
+  else if (overallMargin < 50) adviceList.push(`Общая маржа: Хорошая (Текущая: ${overallMargin.toFixed(2)}%).`)
+  else adviceList.push(`Общая маржа: Отличная (Текущая: ${overallMargin.toFixed(2)}%).`)
 
   const recordsWithoutToday = [...recordsToUse].slice(0, -1)
 
@@ -356,22 +356,31 @@ export default function StatisticsPage() {
   }
 
   const kpiMetrics = [
-    { label: "GMROI", value: gmroi.toFixed(2), icon: Target, description: "Gross Margin Return on Investment" },
+    { 
+      label: "GMROI", 
+      value: gmroi.toFixed(2), 
+      icon: Target, 
+      description: "Валовая рентабельность инвестиций в запасы" 
+    },
     {
-      label: "Daily Revenue Growth",
+      label: "Ежедневный рост выручки",
       value: `${dailyRevenueGrowth.toFixed(2)}%`,
       icon: TrendingUp,
-      description: "7-day average",
+      description: "7-дневное скользящее среднее",
     },
     {
-      label: "Inventory Turnover",
+      label: "Оборачиваемость запасов",
       value: `${inventoryTurnover.toFixed(2)}`,
       icon: Activity,
-      description: "Times per year",
+      description: "Раз в год",
     },
-    { label: "Overall Margin", value: `${overallMargin.toFixed(2)}%`, icon: Percent, description: "Percentage" },
+    { 
+      label: "Общая маржа", 
+      value: `${overallMargin.toFixed(2)}%`, 
+      icon: Percent, 
+      description: "Процент" 
+    },
   ]
-
   const selectedOption = chartOptions.find((opt) => opt.key === selectedMetric)
   let mergedData: MergedRecord[] = []
 
@@ -402,8 +411,8 @@ export default function StatisticsPage() {
       <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--color-border)] px-4 bg-[var(--color-bg-secondary)]">
         <SidebarTrigger className="-ml-1 text-[var(--color-text-primary)]" />
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Statistics</h1>
-          <p className="text-xs text-[var(--color-text-thirdly)]">Get advanced statistics about the shop</p>
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">Статистика</h1>
+          <p className="text-xs text-[var(--color-text-thirdly)]">Развёрнутая статистика о магазине</p>
         </div>
       </header>
 
@@ -412,10 +421,10 @@ export default function StatisticsPage() {
         {/* CEO shop selector */}
         {user.role === "CEO" && (
           <div>
-            <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Select Shop</Label>
+            <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Выберите магазин</Label>
             <Select value={selectedShopId} onValueChange={setSelectedShopId}>
               <SelectTrigger className="w-48 bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
-                <SelectValue placeholder="Select shop" />
+                <SelectValue placeholder="Выберите магазин" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
                 <SelectItem value="ALL">ALL</SelectItem>
@@ -458,15 +467,15 @@ export default function StatisticsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Main Storage Stats
+                Статистики ОСН
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Revenue With Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Продажи С Маржой</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {mainStats.revenueWithMargin.max.toFixed(2)} | Min:{" "}
+                    Макс: {mainStats.revenueWithMargin.max.toFixed(2)} | Мин:{" "}
                     {mainStats.revenueWithMargin.min.toFixed(2)}
                   </div>
                   <div
@@ -476,16 +485,16 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {mainStats.revenueWithMargin.avg.toFixed(2)}
+                    Средняя: {mainStats.revenueWithMargin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Revenue Without Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Продажи Без Маржи</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {mainStats.revenueWithoutMargin.max.toFixed(2)} | Min:{" "}
+                    Макс: {mainStats.revenueWithoutMargin.max.toFixed(2)} | Мин:{" "}
                     {mainStats.revenueWithoutMargin.min.toFixed(2)}
                   </div>
                   <div
@@ -495,16 +504,16 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {mainStats.revenueWithoutMargin.avg.toFixed(2)}
+                    Средняя: {mainStats.revenueWithoutMargin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Маржа</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {mainStats.margin.max.toFixed(2)} | Min: {mainStats.margin.min.toFixed(2)}
+                    Макс: {mainStats.margin.max.toFixed(2)} | Мин: {mainStats.margin.min.toFixed(2)}
                   </div>
                   <div
                     className={`text-sm font-semibold ${
@@ -513,13 +522,13 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {mainStats.margin.avg.toFixed(2)}
+                    Средняя: {mainStats.margin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Average Stock Value</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Средние Остатки</span>
                 <div
                   className={`text-sm font-semibold ${
                     compareMetric(mainStats.avgStock.avg, mainStatsWithoutToday.avgStock.avg)
@@ -538,15 +547,15 @@ export default function StatisticsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Order Storage Stats
+                Статистики ДОП
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Revenue With Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Продажи С Маржой</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {orderStats.revenueWithMargin.max.toFixed(2)} | Min:{" "}
+                    Макс: {orderStats.revenueWithMargin.max.toFixed(2)} | Мин:{" "}
                     {orderStats.revenueWithMargin.min.toFixed(2)}
                   </div>
                   <div
@@ -556,16 +565,16 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {orderStats.revenueWithMargin.avg.toFixed(2)}
+                    Средняя: {orderStats.revenueWithMargin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Revenue Without Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Продажи Без Маржи</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {orderStats.revenueWithoutMargin.max.toFixed(2)} | Min:{" "}
+                    Макс: {orderStats.revenueWithoutMargin.max.toFixed(2)} | Мин:{" "}
                     {orderStats.revenueWithoutMargin.min.toFixed(2)}
                   </div>
                   <div
@@ -578,16 +587,16 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {orderStats.revenueWithoutMargin.avg.toFixed(2)}
+                    Средняя: {orderStats.revenueWithoutMargin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Margin</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Маржа</span>
                 <div className="text-right">
                   <div className="text-xs text-[var(--color-text-thirdly)]">
-                    Max: {orderStats.margin.max.toFixed(2)} | Min: {orderStats.margin.min.toFixed(2)}
+                    Макс: {orderStats.margin.max.toFixed(2)} | Мин: {orderStats.margin.min.toFixed(2)}
                   </div>
                   <div
                     className={`text-sm font-semibold ${
@@ -596,13 +605,13 @@ export default function StatisticsPage() {
                         : "text-red-500"
                     }`}
                   >
-                    Avg: {orderStats.margin.avg.toFixed(2)}
+                    Средняя: {orderStats.margin.avg.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-thirdly)]">Average Stock Value</span>
+                <span className="text-sm text-[var(--color-text-thirdly)]">Средние Остатки</span>
                 <div
                   className={`text-sm font-semibold ${
                     compareMetric(orderStats.avgStock.avg, orderStatsWithoutToday.avgStock.avg)
@@ -621,7 +630,7 @@ export default function StatisticsPage() {
         <Card className="border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
           <CardHeader className="flex flex-row items-center gap-2 space-y-0">
             <AlertCircle className="h-5 w-5 text-[var(--color-text-primary)]" />
-            <CardTitle className="text-base text-[var(--color-text-primary)]">Performance Insights</CardTitle>
+            <CardTitle className="text-base text-[var(--color-text-primary)]">Советы По Эффективности</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -641,17 +650,17 @@ export default function StatisticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TableIcon className="h-5 w-5" />
-              Daily Records Table
+              Таблица Записей
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* CEO-only shop selector */}
             {user?.role === "CEO" && (
               <div>
-                <p className="text-sm mb-1 text-[var(--color-text-primary)]">Select shop</p>
+                <p className="text-sm mb-1 text-[var(--color-text-primary)]">Выберите магазин</p>
                 <Select value={tableSelectedShop} onValueChange={setTableSelectedShop}>
                   <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
-                    <SelectValue placeholder="Select shop" />
+                    <SelectValue placeholder="Выберите магазин" />
                   </SelectTrigger>
                   <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                     <SelectItem value="ALL">All</SelectItem>
@@ -667,43 +676,43 @@ export default function StatisticsPage() {
 
             {/* Date pickers */}
             <div className="flex gap-4 flex-wrap">
-              <DatePicker title="From date" value={tableFromDate} onChange={setTableFromDate} />
-              <DatePicker title="To date" value={tableToDate} onChange={setTableToDate} />
+              <DatePicker title="От" value={tableFromDate} onChange={setTableFromDate} />
+              <DatePicker title="До" value={tableToDate} onChange={setTableToDate} />
               <div className="flex items-end">
                 <Button
                   onClick={handleTableFetch}
                   className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
                 >
-                  Fetch Records
+                  Получить Данные
                 </Button>
               </div>
             </div>
 
             {/* Table section */}
             <div>
-              {tableLoading && <p>Loading...</p>}
+              {tableLoading && <p>Загрузка...</p>}
               {!tableLoading && tableRecords && tableRecords.length > 0 && (
                 <ScrollArea className="h-[40vh] w-full rounded-lg border border-[var(--color-border-sheet)]">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-[var(--color-text-primary)]">Record date</TableHead>
+                        <TableHead className="text-[var(--color-text-primary)]">Дата</TableHead>
                         {user?.role === "CEO" && (
-                          <TableHead className="text-[var(--color-text-primary)]">Shop</TableHead>
+                          <TableHead className="text-[var(--color-text-primary)]">Магазин</TableHead>
                         )}
-                        <TableHead className="text-[var(--color-text-primary)]">Main stock value</TableHead>
-                        <TableHead className="text-[var(--color-text-primary)]">Order stock value</TableHead>
+                        <TableHead className="text-[var(--color-text-primary)]">Остатки ОСН</TableHead>
+                        <TableHead className="text-[var(--color-text-primary)]">Остатки ДОП</TableHead>
                         <TableHead className="text-[var(--color-text-primary)]">
-                          Revenue main stock (with margin)
+                          Продажи ОСН (С Маржой)
                         </TableHead>
                         <TableHead className="text-[var(--color-text-primary)]">
-                          Revenue main stock (without margin)
+                          Продажи ОСН (Без Маржи)
                         </TableHead>
                         <TableHead className="text-[var(--color-text-primary)]">
-                          Revenue order stock (with margin)
+                          Продажи ДОП (С Маржой)
                         </TableHead>
                         <TableHead className="text-[var(--color-text-primary)]">
-                          Revenue order stock (without margin)
+                          Продажи ДОП (Без Маржи)
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -727,7 +736,7 @@ export default function StatisticsPage() {
                 </ScrollArea>
               )}
               {!tableLoading && tableRecords && tableRecords.length === 0 && (
-                <p className="text-[var(--color-text-secondary)] mt-4">No records found in this range.</p>
+                <p className="text-[var(--color-text-secondary)] mt-4">В данном периоде данных не обнаружено.</p>
               )}
             </div>
           </CardContent>
@@ -737,21 +746,21 @@ export default function StatisticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Daily Records Chart
+              График Записей
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4 flex-wrap items-end">
-              <DatePicker title="From date" value={chartFromDate} onChange={setChartFromDate} />
-              <DatePicker title="To date" value={chartToDate} onChange={setChartToDate} />
+              <DatePicker title="От" value={chartFromDate} onChange={setChartFromDate} />
+              <DatePicker title="До" value={chartToDate} onChange={setChartToDate} />
               <div>
-                <p className="text-sm mb-1">Select metric</p>
+                <p className="text-sm mb-1">Выберите метрику</p>
                 <Select
                   value={selectedMetric ?? undefined}
                   onValueChange={(val) => setSelectedMetric(val as (typeof chartOptions)[number]["key"])}
                 >
                   <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
-                    <SelectValue placeholder="Select metric" />
+                    <SelectValue placeholder="Выберите метрику" />
                   </SelectTrigger>
                   <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                     {chartOptions.map((opt) => (
@@ -767,14 +776,14 @@ export default function StatisticsPage() {
                   onClick={handleChartFetch}
                   className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
                 >
-                  Fetch Chart
+                  Получить График
                 </Button>
               </div>
             </div>
 
             {user?.role === "CEO" && shops.length > 0 && (
               <div>
-                <p className="text-sm mb-2">Select shops</p>
+                <p className="text-sm mb-2">Выберите магазины</p>
                 <div className="flex flex-wrap gap-4">
                   {shops.map((shop, idx) => (
                     <label key={shop.id} className="flex items-center gap-2">

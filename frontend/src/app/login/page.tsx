@@ -61,7 +61,7 @@ export default function LoginPage() {
       <Card className="relative z-10 w-96 shadow-lg border-2 bg-[var(--color-bg-secondary)] border-[var(--color-border-sheet)]">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-[var(--color-text-primary)]">
-            Login
+            Вход
           </CardTitle>
         </CardHeader>
 
@@ -73,16 +73,16 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={setEmail}
-              placeholder="Enter your email"
+              placeholder="Введите email"
               disabled={isLoading}
             />
             <LoginFormField
               id="password"
-              label="Password"
+              label="Пароль"
               type="password"
               value={password}
               onChange={setPassword}
-              placeholder="Enter your password"
+              placeholder="Введите пароль"
               disabled={isLoading}
             />
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 ${isLoading ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]"}
               `}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Вход..." : "Войти"}
             </Button>
           </form>
         </CardContent>

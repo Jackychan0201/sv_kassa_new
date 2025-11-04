@@ -45,9 +45,9 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
     try {
       await saveReminderTime(user.shopId, "00:00");
       setTimer("00:00");
-      toast.info("Timer is reset!");
+      toast.info("Напоминание сброшено!");
     } catch (err) {
-      handleError(err, "Failed to reset a reminder");
+      handleError(err, "Не удалось сбросить напоминание");
       router.push("/login");
     }
   };
@@ -59,9 +59,9 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       const timeToSave = selectedTime ?? "00:00";
       await saveReminderTime(user.shopId, timeToSave);
       setTimer(timeToSave);
-      toast.success(`The timer is set to ${timeToSave}`);
+      toast.success(`Напоминание установлено на ${timeToSave}`);
     } catch (err) {
-      handleError(err, "Failed to save reminder");
+      handleError(err, "Не удалось установить напоминание");
       router.push("/login");
     } finally {
       setOpen(false);
@@ -74,21 +74,21 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
       <form>
         <DialogTrigger asChild>
           <Button className="disabled:opacity-50 w-50 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-bg-select-hover)]">
-            Set reminder
+            Установить напоминание
           </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[425px] border-black bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]">
           <DialogHeader>
-            <DialogTitle>Set reminder</DialogTitle>
+            <DialogTitle>Установить напоминание</DialogTitle>
             <DialogDescription className="text-[var(--color-text-primary)]">
               {selectedTime && selectedTime !== "00:00"
-                ? `The timer is set to ${selectedTime}`
-                : "Timer is not set"}
+                ? `Напoминание установлено на ${selectedTime}`
+                : "Напоминание не установлено"}
             </DialogDescription>
           </DialogHeader>
 
-          <Label htmlFor="time-picker">Time</Label>
+          <Label htmlFor="time-picker">Время</Label>
           <Input
             className="w-30 bg-[var(--color-bg-select-content)] appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
             id="time-picker"
@@ -103,7 +103,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
                 className="w-30 transition text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type1)]"
                 onClick={handleReset}
               >
-                Reset
+                Сброс
               </Button>
             </DialogClose>
             <Button
@@ -111,7 +111,7 @@ export function SetReminderDialog({ onSaved }: SetReminderDialogProps) {
               onClick={handleOk}
               className="w-20 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] delay-150 duration-300 ease-in-out hover:-translate-y-0 hover:scale-105 hover:bg-[var(--color-button-bg-hover-type2)]"
             >
-              Ok
+              Ок
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -13,14 +13,9 @@ export class CreateShopDto {
 
   @ApiProperty({
     example: 'P@ssw0rd123!',
-    description: 'Password for the shop (min 8 chars, uppercase, lowercase, number, special char)',
+    description: 'Password for the shop',
   })
   @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  @Matches(/(?=.*[A-Z])/, { message: 'Password must contain at least one uppercase letter' })
-  @Matches(/(?=.*[a-z])/, { message: 'Password must contain at least one lowercase letter' })
-  @Matches(/(?=.*\d)/, { message: 'Password must contain at least one number' })
-  @Matches(/(?=.*[@$!%*?&])/, { message: 'Password must contain at least one special character (@$!%*?&)' })
   password: string;
 
   @ApiProperty({
