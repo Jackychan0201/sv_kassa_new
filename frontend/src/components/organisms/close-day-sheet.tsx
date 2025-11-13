@@ -66,6 +66,10 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
+  const normalizeNumber = (value: string): string => {
+    return value.replace(/\s+/g, "").replace(",", ".");
+  };
+
   const handleSave = async () => {
     if (!selectedShop) {
       toast.error("Пожалуйста, выберите магазин");
@@ -86,10 +90,27 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
         toast.error(`${field.label} не может быть пустым`);
         return;
       }
-      if (isNaN(Number(field.value))) {
+
+      const normalized = normalizeNumber(field.value);
+
+      if (isNaN(Number(normalized))) {
         toast.error(`${field.label} должны быть числом`);
         return;
       }
+    }
+
+    const mainWith = Number(normalizeNumber(form.mainRevenueWithMargin));
+    const mainWithout = Number(normalizeNumber(form.mainRevenueWithoutMargin));
+    if (mainWith < mainWithout) {
+      toast.error("Продажи ОСН (С Маржой) должны быть больше или равны Продажи ОСН (Без Маржи)");
+      return;
+    }
+
+    const orderWith = Number(normalizeNumber(form.orderRevenueWithMargin));
+    const orderWithout = Number(normalizeNumber(form.orderRevenueWithoutMargin));
+    if (orderWith < orderWithout) {
+      toast.error("Продажи ДОП (С Маржой) должны быть больше или равны Продажи ДОП (Без Маржи)");
+      return;
     }
 
     try {
@@ -97,12 +118,12 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
 
       await postDailyRecord({
         shopId: selectedShop.id,
-        mainStockValue: Number(form.mainStockValue),
-        orderStockValue: Number(form.orderStockValue),
-        revenueMainWithMargin: Number(form.mainRevenueWithMargin),
-        revenueMainWithoutMargin: Number(form.mainRevenueWithoutMargin),
-        revenueOrderWithMargin: Number(form.orderRevenueWithMargin),
-        revenueOrderWithoutMargin: Number(form.orderRevenueWithoutMargin),
+        mainStockValue: Number(normalizeNumber(form.mainStockValue)),
+        orderStockValue: Number(normalizeNumber(form.orderStockValue)),
+        revenueMainWithMargin: Number(normalizeNumber(form.mainRevenueWithMargin)),
+        revenueMainWithoutMargin: Number(normalizeNumber(form.mainRevenueWithoutMargin)),
+        revenueOrderWithMargin: Number(normalizeNumber(form.orderRevenueWithMargin)),
+        revenueOrderWithoutMargin: Number(normalizeNumber(form.orderRevenueWithoutMargin)),
         recordDate: formattedDate,
       });
 
@@ -116,6 +137,7 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
       setLoading(false);
     }
   };
+
 
   // Load shops for CEO
   useEffect(() => {
@@ -140,10 +162,10 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
   const fieldsConfig = [
     { key: "mainStockValue", label: "Остатки ОСН", placeholder: "e.g. 12345.00" },
     { key: "orderStockValue", label: "Остатки ДОП", placeholder: "e.g. 5678.00" },
-    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
     { key: "mainRevenueWithoutMargin", label: "Продажи ОСН (Без Маржи)", placeholder: "e.g. 7000.00" },
-    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
+    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
     { key: "orderRevenueWithoutMargin", label: "Продажи ДОП (Без Маржи)", placeholder: "e.g. 3500.00" },
+    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
   ];
 
   return (

@@ -10,8 +10,13 @@ const nunitoSans = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SV Kassa",
-  description: "A storage register application for business",
+  title: "СВ Касса",
+  description: "Приложение для учета товаров",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({

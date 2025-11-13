@@ -153,6 +153,10 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
     }
   }
 
+  const normalizeNumber = (value: string): string => {
+    return value.replace(/\s+/g, "").replace(",", ".");
+  };
+
   const handleSave = async () => {
     if (!selectedDate || !selectedShop) {
       toast.error("Пожалуйста, выберите дату и магазин")
@@ -166,11 +170,29 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
       .padStart(2, "0")}.${selectedDate.getFullYear()}`
 
     try {
-      for (const [key, value] of Object.entries(form)) {
-        if (value.trim() !== "" && isNaN(Number(value))) {
-          toast.error(`${key} должны быть числом`)
-          return
+      for (const [key, rawValue] of Object.entries(form)) {
+        if (rawValue.trim() === "") continue;
+
+        const value = normalizeNumber(rawValue);
+
+        if (isNaN(Number(value))) {
+          toast.error(`${key} должны быть числом`);
+          return;
         }
+      }
+
+      const mainWith = Number(normalizeNumber(form.mainRevenueWithMargin));
+      const mainWithout = Number(normalizeNumber(form.mainRevenueWithoutMargin));
+      if (!isNaN(mainWith) && !isNaN(mainWithout) && mainWith < mainWithout) {
+        toast.error("Продажи ОСН (С Маржой) должны быть больше или равны Продажи ОСН (Без Маржи)");
+        return;
+      }
+
+      const orderWith = Number(normalizeNumber(form.orderRevenueWithMargin));
+      const orderWithout = Number(normalizeNumber(form.orderRevenueWithoutMargin));
+      if (!isNaN(orderWith) && !isNaN(orderWithout) && orderWith < orderWithout) {
+        toast.error("Продажи ДОП (С Маржой) должны быть больше или равны Продажи ДОП (Без Маржи)");
+        return;
       }
 
       setLoading(true)
@@ -178,22 +200,22 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
       if (record && record.length > 0) {
         await updateDailyRecord({
           id: record[0].id,
-          mainStockValue: Number(form.mainStockValue),
-          orderStockValue: Number(form.orderStockValue),
-          revenueMainWithMargin: Number(form.mainRevenueWithMargin),
-          revenueMainWithoutMargin: Number(form.mainRevenueWithoutMargin),
-          revenueOrderWithMargin: Number(form.orderRevenueWithMargin),
-          revenueOrderWithoutMargin: Number(form.orderRevenueWithoutMargin),
+          mainStockValue: Number(normalizeNumber(form.mainStockValue)),
+          orderStockValue: Number(normalizeNumber(form.orderStockValue)),
+          revenueMainWithMargin: Number(normalizeNumber(form.mainRevenueWithMargin)),
+          revenueMainWithoutMargin: Number(normalizeNumber(form.mainRevenueWithoutMargin)),
+          revenueOrderWithMargin: Number(normalizeNumber(form.orderRevenueWithMargin)),
+          revenueOrderWithoutMargin: Number(normalizeNumber(form.orderRevenueWithoutMargin)),
         })
       } else {
         await postDailyRecord({
           shopId: selectedShop.id,
-          mainStockValue: Number(form.mainStockValue),
-          orderStockValue: Number(form.orderStockValue),
-          revenueMainWithMargin: Number(form.mainRevenueWithMargin),
-          revenueMainWithoutMargin: Number(form.mainRevenueWithoutMargin),
-          revenueOrderWithMargin: Number(form.orderRevenueWithMargin),
-          revenueOrderWithoutMargin: Number(form.orderRevenueWithoutMargin),
+          mainStockValue: Number(normalizeNumber(form.mainStockValue)),
+          orderStockValue: Number(normalizeNumber(form.orderStockValue)),
+          revenueMainWithMargin: Number(normalizeNumber(form.mainRevenueWithMargin)),
+          revenueMainWithoutMargin: Number(normalizeNumber(form.mainRevenueWithoutMargin)),
+          revenueOrderWithMargin: Number(normalizeNumber(form.orderRevenueWithMargin)),
+          revenueOrderWithoutMargin: Number(normalizeNumber(form.orderRevenueWithoutMargin)),
           recordDate: formattedDate,
         })
       }
@@ -212,10 +234,10 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
   const inputFields = [
     { key: "mainStockValue", label: "Остатки ОСН", placeholder: "e.g. 12345.00" },
     { key: "orderStockValue", label: "Остатки ДОП", placeholder: "e.g. 5678.00" },
-    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
     { key: "mainRevenueWithoutMargin", label: "Продажи ОСН (Без Маржи)", placeholder: "e.g. 7000.00" },
-    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
+    { key: "mainRevenueWithMargin", label: "Продажи ОСН (С Маржой)", placeholder: "e.g. 8000.00" },
     { key: "orderRevenueWithoutMargin", label: "Продажи ДОП (Без Маржи)", placeholder: "e.g. 3500.00" },
+    { key: "orderRevenueWithMargin", label: "Продажи ДОП (С Маржой)", placeholder: "e.g. 4000.00" },
   ] as const
 
   return (

@@ -199,7 +199,15 @@ export default function StatisticsPage() {
   }
 
   if (recordsToUse.length === 0) {
-    return <Label>В данном периоде данных не обнаружено.</Label>
+    return(
+      <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-main)] w-full h-full">
+        <div
+          className="flex flex-col items-center justify-center gap-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-secondary)] p-6 shadow-md"
+          style={{ minHeight: "25vh", minWidth: "300px" }}
+        >
+          <Label className="text-xl md:text-2xl text-[var(--color-text-primary)]">В данном периоде данных не обнаружено</Label>
+        </div>
+      </div>)
   }
 
   const calculateGMROI = (records: DailyRecord[]) => {
