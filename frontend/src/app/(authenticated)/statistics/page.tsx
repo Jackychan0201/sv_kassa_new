@@ -28,6 +28,9 @@ const chartOptions = [
   { key: "revenueMainWithoutMargin", label: "Продажи ОСН (Без Маржи)" },
   { key: "revenueOrderWithMargin", label: "Продажи ДОП (С Маржой)" },
   { key: "revenueOrderWithoutMargin", label: "Продажи ДОП (Без Маржи)" },
+  { key: "mainMargin", label: "Маржа ОСН" },
+  { key: "orderMargin", label: "Маржа ДОП" },
+  { key: "totalRevenue", label: "Общие продажи" },
 ] as const
 
 const lineColors = [
@@ -392,13 +395,26 @@ export default function StatisticsPage() {
   const selectedOption = chartOptions.find((opt) => opt.key === selectedMetric)
   let mergedData: MergedRecord[] = []
 
+  const getMetricValue = (rec: DailyRecord, metric: string): number => {
+    switch (metric) {
+      case "mainMargin":
+        return rec.revenueMainWithMargin - rec.revenueMainWithoutMargin
+      case "orderMargin":
+        return rec.revenueOrderWithMargin - rec.revenueOrderWithoutMargin
+      case "totalRevenue":
+        return rec.revenueMainWithMargin + rec.revenueOrderWithMargin
+      default:
+        return (rec as any)[metric] ?? 0
+    }
+  }
+
   if (chartRecords && selectedMetric) {
     if (user?.role === "CEO") {
       mergedData = Object.values(
         chartRecords.reduce(
           (acc, rec) => {
             if (!acc[rec.recordDate]) acc[rec.recordDate] = { recordDate: rec.recordDate }
-            const value = rec[selectedMetric] ?? 0
+            const value = getMetricValue(rec, selectedMetric)
             acc[rec.recordDate][rec.shopId] = value
             return acc
           },
@@ -408,7 +424,7 @@ export default function StatisticsPage() {
     } else {
       mergedData = chartRecords.map((rec) => ({
         recordDate: rec.recordDate,
-        [selectedMetric]: rec[selectedMetric] ?? 0,
+        [selectedMetric]: getMetricValue(rec, selectedMetric),
       }))
     }
   }
