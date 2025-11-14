@@ -404,7 +404,7 @@ export default function StatisticsPage() {
       case "totalRevenue":
         return rec.revenueMainWithMargin + rec.revenueOrderWithMargin
       default:
-        return (rec as any)[metric] ?? 0
+        return (rec[metric as keyof DailyRecord] as number) ?? 0
     }
   }
 
