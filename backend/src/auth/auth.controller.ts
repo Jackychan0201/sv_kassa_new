@@ -20,26 +20,32 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    
     const { token, expiresInMs } = await this.authService.login(dto.email, dto.password);
 
+    // IMPORTANT: sameSite must be "none" for cross-domain cookies
     res.cookie('Authentication', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
+      path: '/',
       maxAge: expiresInMs,
     });
 
-    return { message: 'Login successful', expiresInMs: expiresInMs};
+    return {
+      message: 'Login successful',
+      expiresInMs: expiresInMs,
+    };
   }
 
   @Post('logout')
   @ApiOperation({ summary: 'Logout the current shop' })
   async logout(@Res({ passthrough: true }) res: Response) {
 
+    // must match the cookie attributes EXACTLY
     res.clearCookie('Authentication', {
       httpOnly: true,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
     });
 
@@ -57,5 +63,4 @@ export class AuthController {
       role: user.role,
     };
   }
-
 }
