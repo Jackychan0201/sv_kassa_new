@@ -34,7 +34,15 @@ export async function POST(req: NextRequest) {
     clearOptions.domain = '.vercel.app';
   }
 
-  res.cookies.set(clearOptions as any);
+  // Use the cookie setter overload (name, value, options) to avoid 'any' typing
+  res.cookies.set(clearOptions.name, clearOptions.value, {
+    path: clearOptions.path,
+    maxAge: clearOptions.maxAge,
+    httpOnly: clearOptions.httpOnly,
+    secure: clearOptions.secure,
+    sameSite: clearOptions.sameSite,
+    domain: clearOptions.domain,
+  });
   
   return res;
 }
