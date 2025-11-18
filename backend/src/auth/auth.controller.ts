@@ -25,14 +25,29 @@ export class AuthController {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    const { token, expiresInMs } = await this.authService.login(dto.email, dto.password);
+    // Clear any existing authentication cookie first
     const isProduction = process.env.NODE_ENV === 'production';
-
-    res.cookie('Authentication', token, {
+    const baseOptions = {
       httpOnly: true,
       secure: true,
-      sameSite: 'none', // cross-domain
+      sameSite: 'none' as const,
       path: '/',
+    };
+
+    if (isProduction && process.env.NEXT_PUBLIC_COOKIE_DOMAIN) {
+      res.clearCookie('Authentication', {
+        ...baseOptions,
+        domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+      });
+    }
+    res.clearCookie('Authentication', baseOptions);
+
+    // Now perform login
+    const { token, expiresInMs } = await this.authService.login(dto.email, dto.password);
+
+    // Set new cookie
+    res.cookie('Authentication', token, {
+      ...baseOptions,
       maxAge: expiresInMs,
       ...(isProduction && process.env.NEXT_PUBLIC_COOKIE_DOMAIN
         ? { domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN }
@@ -53,22 +68,25 @@ export class AuthController {
     res.setHeader('Expires', '0');
 
     const isProduction = process.env.NODE_ENV === 'production';
-
-    const cookieOptions = {
+    
+    // Clear cookie with all possible domain configurations
+    const baseOptions = {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'none' as const,
       path: '/',
-      domain: isProduction ? process.env.NEXT_PUBLIC_COOKIE_DOMAIN : undefined,
     };
 
-    // Clear domain-scoped cookie if exists
-    if (cookieOptions.domain) {
-      res.clearCookie('Authentication', cookieOptions);
+    // Clear with domain if in production
+    if (isProduction && process.env.NEXT_PUBLIC_COOKIE_DOMAIN) {
+      res.clearCookie('Authentication', {
+        ...baseOptions,
+        domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+      });
     }
-
-    // Always clear host-scoped cookie
-    res.clearCookie('Authentication', { ...cookieOptions, domain: undefined });
+    
+    // Always clear without domain (for localhost and fallback)
+    res.clearCookie('Authentication', baseOptions);
 
     return { message: 'Logged out successfully' };
   }

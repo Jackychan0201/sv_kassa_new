@@ -3,16 +3,27 @@ import { handleError } from "@/lib/utils";
 
 export const login = async (username: string, password: string) => { 
   try { 
-    const res = await fetch("/api/auth/login", { 
+    const timestamp = Date.now();
+    
+    // Clear any local storage first
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+    }
+    
+    const res = await fetch(`/api/auth/login?t=${timestamp}`, { 
       method: "POST", 
       headers: { 
         "Content-Type": "application/json",
-        "Cache-Control": "no-cache",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
       }, 
       body: JSON.stringify({ email: username, password }), 
       credentials: "include",
       cache: 'no-store' as RequestCache,
     }); 
+    
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
       const message = (errorData && errorData.message) || "Login failed"; 
@@ -38,11 +49,23 @@ export const login = async (username: string, password: string) => {
 
 export const logout = async () => { 
   try { 
-    const res = await fetch("/api/auth/logout", { 
+    // Clear any local storage or state first
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+    }
+    
+    const timestamp = Date.now();
+    const res = await fetch(`/api/auth/logout?t=${timestamp}`, { 
       method: "POST", 
       credentials: "include",
       cache: 'no-store' as RequestCache,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      }
     }); 
+    
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
       const message = (errorData && errorData.message) || "Logout failed"; 
@@ -57,9 +80,18 @@ export const logout = async () => {
       console.warn('Logout verification: User session still exists');
     }
     
-    return res.json(); 
+    // Force a hard refresh to clear any cached state
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    
+    return await res.json(); 
   } catch (error) { 
     handleError(error, "Logout failed"); 
+    // Still redirect even if there's an error
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
     throw error; 
   } 
 }; 
@@ -67,9 +99,14 @@ export const logout = async () => {
 // Add this utility function
 export const verifyAuthState = async () => {
   try {
-    const res = await fetch("/api/auth/me", {
+    const timestamp = Date.now();
+    const res = await fetch(`/api/auth/me?t=${timestamp}`, {
       credentials: "include",
       cache: 'no-store' as RequestCache,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      }
     });
     return res.ok ? await res.json() : null;
   } catch {
@@ -79,12 +116,16 @@ export const verifyAuthState = async () => {
 
 export const getDailyRecords = async (): Promise<DailyRecord[]> => { 
   try { 
-    const res = await fetch("/api/daily-records", { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/daily-records?t=${timestamp}`, { 
       method: "GET", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -102,14 +143,18 @@ export const getDailyRecords = async (): Promise<DailyRecord[]> => {
 
 export const getRecordByDate = async (date: string): Promise<DailyRecord[]> => { 
   try { 
+    const timestamp = Date.now();
     const res = await fetch( 
-      `/api/daily-records/by-date?fromDate=${date}&toDate=${date}`, 
+      `/api/daily-records/by-date?fromDate=${date}&toDate=${date}&t=${timestamp}`, 
       { 
         method: "GET", 
         headers: { 
-          "Content-Type": "application/json" 
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
         }, 
         credentials: "include", 
+        cache: 'no-store' as RequestCache,
       } 
     ); 
     if (!res.ok) { 
@@ -128,14 +173,18 @@ export const getRecordByDate = async (date: string): Promise<DailyRecord[]> => {
 
 export const getRecordsByRange = async (fromDate: string, toDate: string): Promise<DailyRecord[]> => { 
   try { 
+    const timestamp = Date.now();
     const res = await fetch( 
-      `/api/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}`, 
+      `/api/daily-records/by-date?fromDate=${fromDate}&toDate=${toDate}&t=${timestamp}`, 
       { 
         method: "GET", 
         headers: { 
-          "Content-Type": "application/json" 
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
         }, 
         credentials: "include", 
+        cache: 'no-store' as RequestCache,
       } 
     ); 
     if (!res.ok) { 
@@ -154,13 +203,17 @@ export const getRecordsByRange = async (fromDate: string, toDate: string): Promi
 
 export const updateDailyRecord = async (record: { id: string; mainStockValue: number; orderStockValue: number; revenueMainWithMargin: number; revenueMainWithoutMargin: number; revenueOrderWithMargin: number; revenueOrderWithoutMargin: number; }) => { 
   try { 
-    const res = await fetch(`/api/daily-records/${record.id}`, { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/daily-records/${record.id}?t=${timestamp}`, { 
       method: "PATCH", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
       body: JSON.stringify(record), 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -178,13 +231,17 @@ export const updateDailyRecord = async (record: { id: string; mainStockValue: nu
 
 export const postDailyRecord = async (record: { shopId: string; mainStockValue: number; orderStockValue: number; revenueMainWithMargin: number; revenueMainWithoutMargin: number; revenueOrderWithMargin: number; revenueOrderWithoutMargin: number; recordDate: string; }) => { 
   try { 
-    const res = await fetch("/api/daily-records", { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/daily-records?t=${timestamp}`, { 
       method: "POST", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
       body: JSON.stringify(record), 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -202,13 +259,17 @@ export const postDailyRecord = async (record: { shopId: string; mainStockValue: 
 
 export const saveReminderTime = async (shopId: string, time: string) => { 
   try { 
-    const res = await fetch(`/api/shops/${shopId}`, { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops/${shopId}?t=${timestamp}`, { 
       method: "PATCH", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
       body: JSON.stringify({ id: shopId, timer: time }), 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -226,12 +287,16 @@ export const saveReminderTime = async (shopId: string, time: string) => {
 
 export const getShopById = async (id: string): Promise<Shop> => { 
   try { 
-    const res = await fetch(`/api/shops/${id}`, { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops/${id}?t=${timestamp}`, { 
       method: "GET", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -249,12 +314,16 @@ export const getShopById = async (id: string): Promise<Shop> => {
 
 export const getAllShops = async (): Promise<Shop[]> => { 
   try { 
-    const res = await fetch('/api/shops', { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops?t=${timestamp}`, { 
       method: 'GET', 
       headers: { 
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json',
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: 'include', 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -272,13 +341,17 @@ export const getAllShops = async (): Promise<Shop[]> => {
 
 export const createShop = async (shop: { name: string; email: string; password: string; role?: string; }) => { 
   try { 
-    const res = await fetch('/api/shops', { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops?t=${timestamp}`, { 
       method: 'POST', 
       headers: { 
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json',
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: 'include', 
       body: JSON.stringify(shop), 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -293,12 +366,16 @@ export const createShop = async (shop: { name: string; email: string; password: 
 
 export const deleteShop = async (shopId: string) => { 
   try { 
-    const res = await fetch(`/api/shops/${shopId}`, { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops/${shopId}?t=${timestamp}`, { 
       method: 'DELETE', 
       headers: { 
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json',
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: 'include', 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
@@ -320,13 +397,17 @@ interface UpdateShopAccountData {
 
 export const updateShopAccount = async (shopId: string, data: UpdateShopAccountData) => { 
   try { 
-    const res = await fetch(`/api/shops/${shopId}`, { 
+    const timestamp = Date.now();
+    const res = await fetch(`/api/shops/${shopId}?t=${timestamp}`, { 
       method: "PATCH", 
       headers: { 
-        "Content-Type": "application/json" 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       }, 
       credentials: "include", 
       body: JSON.stringify(data), 
+      cache: 'no-store' as RequestCache,
     }); 
     if (!res.ok) { 
       const errorData = await res.json().catch(() => null); 
