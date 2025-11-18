@@ -26,13 +26,12 @@ export async function POST(req: NextRequest) {
     path: "/",
     maxAge: 0,
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   };
-
-  if (process.env.NODE_ENV === 'production') {
-    clearOptions.domain = '.vercel.app';
-  }
+  // Use the same domain logic as login route: only set explicit domain if configured
+  const configuredDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+  if (configuredDomain) clearOptions.domain = configuredDomain;
 
   // Use the cookie setter overload (name, value, options) to avoid 'any' typing
   res.cookies.set(clearOptions.name, clearOptions.value, {
