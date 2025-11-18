@@ -14,7 +14,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @Throttle({ default: { limit: 3, ttl: (1 * 60 * 1000) } })
+  @Throttle({ default: { limit: 10, ttl: (1 * 60 * 1000) } })
   @ApiOperation({ summary: 'Login as a shop' })
   async login(
     @Body() dto: LoginDto,
