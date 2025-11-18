@@ -9,16 +9,16 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify(body),
   });
 
-  const data = await response.json();
-  const res = NextResponse.json(data, { status: response.status });
+  // Pass through the backend Set-Cookie header as-is
+  const res = new NextResponse(await response.text(), {
+    status: response.status,
+  });
 
   const setCookie = response.headers.get("set-cookie");
   if (setCookie) {
-    const cookies = setCookie.split(";").map((c) => c.trim());
-    const [cookieNameValue] = cookies;
-    const [name, value] = cookieNameValue.split("=");
-    res.cookies.set({ name, value, httpOnly: true, path: "/" });
+    res.headers.set("set-cookie", setCookie);
   }
 
   return res;
 }
+
