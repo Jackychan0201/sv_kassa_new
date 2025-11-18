@@ -1,7 +1,6 @@
-import { Controller, Post, Body, Res, Req, UseGuards, BadRequestException, Get } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { Response } from 'express';
-import type { Request } from 'express';
+import type { Response, Request } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './auth.guard';
@@ -14,56 +13,62 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @Throttle({ default: { limit: 10, ttl: (1 * 60 * 1000) } })
+  @Throttle({ default: { limit: 10, ttl: 1 * 60 * 1000 } })
   @ApiOperation({ summary: 'Login as a shop' })
   async login(
     @Body() dto: LoginDto,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ) {
     // Prevent caching
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
     const { token, expiresInMs } = await this.authService.login(dto.email, dto.password);
-
     const isProduction = process.env.NODE_ENV === 'production';
-    
-    // IMPORTANT: sameSite must be "none" for cross-domain cookies
+
     res.cookie('Authentication', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'none', // cross-domain
       path: '/',
       maxAge: expiresInMs,
-      ...(isProduction && { domain: '.vercel.app' }) // Note the leading dot for subdomains
+      ...(isProduction && process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+        ? { domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN }
+        : {}),
     });
 
     return {
       message: 'Login successful',
-      expiresInMs: expiresInMs,
+      expiresInMs,
     };
   }
 
   @Post('logout')
   @ApiOperation({ summary: 'Logout the current shop' })
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    // Prevent caching
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
     const isProduction = process.env.NODE_ENV === 'production';
-    
-    // Clear cookie with same attributes as set, including domain
-    res.clearCookie('Authentication', {
+
+    const cookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       path: '/',
-      ...(isProduction && { domain: '.vercel.app' })
-    });
+      domain: isProduction ? process.env.NEXT_PUBLIC_COOKIE_DOMAIN : undefined,
+    };
+
+    // Clear domain-scoped cookie if exists
+    if (cookieOptions.domain) {
+      res.clearCookie('Authentication', cookieOptions);
+    }
+
+    // Always clear host-scoped cookie
+    res.clearCookie('Authentication', { ...cookieOptions, domain: undefined });
 
     return { message: 'Logged out successfully' };
   }
