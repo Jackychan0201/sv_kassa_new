@@ -36,13 +36,22 @@ export async function POST(req: NextRequest) {
   // Use the cookie setter overload (name, value, options) to avoid 'any' typing
   // Clear cookie for configured domain (if any) and for host-scoped cookie as a fallback.
   // Some browsers may have both a domain-scoped and a host-scoped cookie with the same name.
-  const cookieOptionsForSet = {
+  type CookieSetOptions = {
+    path?: string;
+    maxAge?: number;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: 'lax' | 'strict' | 'none';
+    domain?: string;
+  };
+
+  const cookieOptionsForSet: CookieSetOptions = {
     path: clearOptions.path,
     maxAge: clearOptions.maxAge,
     httpOnly: clearOptions.httpOnly,
     secure: clearOptions.secure,
     sameSite: clearOptions.sameSite,
-  } as const;
+  };
 
   // If a configured domain exists, clear the domain-scoped cookie first
   if (clearOptions.domain) {
@@ -53,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Also clear the host-scoped cookie (no domain) to ensure removal
-  res.cookies.set(clearOptions.name, clearOptions.value, cookieOptionsForSet as any);
+  res.cookies.set(clearOptions.name, clearOptions.value, cookieOptionsForSet);
   
   return res;
 }
