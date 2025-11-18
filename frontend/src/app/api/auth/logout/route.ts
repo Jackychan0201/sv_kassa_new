@@ -9,21 +9,40 @@ export async function POST(req: NextRequest) {
   const res = NextResponse.json({ message: "Logged out" });
   
   // Clear cookie with same attributes as set
-  const clearOptions: any = {
+  interface CookieOptions {
+    name: string;
+    value: string;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: 'lax' | 'strict' | 'none';
+    path?: string;
+    maxAge?: number;
+    domain?: string;
+  }
+
+  const clearOptions: CookieOptions = {
     name: "Authentication",
     value: "",
     path: "/",
     maxAge: 0,
     httpOnly: true,
     secure: true,
-    sameSite: 'none' as const
+    sameSite: 'none',
   };
-  
+
   if (process.env.NODE_ENV === 'production') {
     clearOptions.domain = '.vercel.app';
   }
-  
-  res.cookies.set(clearOptions);
+
+  // Use the cookie setter overload (name, value, options) to avoid 'any' typing
+  res.cookies.set(clearOptions.name, clearOptions.value, {
+    path: clearOptions.path,
+    maxAge: clearOptions.maxAge,
+    httpOnly: clearOptions.httpOnly,
+    secure: clearOptions.secure,
+    sameSite: clearOptions.sameSite,
+    domain: clearOptions.domain,
+  });
   
   return res;
 }

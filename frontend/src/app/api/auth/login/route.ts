@@ -28,14 +28,25 @@ export async function POST(req: NextRequest) {
           maxAge = parseInt(maxAgeAttr.split('=')[1]);
         }
         
-        const cookieOptions: any = {
+        interface CookieOptions {
+          name: string;
+          value: string;
+          httpOnly?: boolean;
+          secure?: boolean;
+          sameSite?: 'lax' | 'strict' | 'none';
+          path?: string;
+          maxAge?: number;
+          domain?: string;
+        }
+
+        const cookieOptions: CookieOptions = {
           name,
           value,
           httpOnly: true,
           secure: true,
-          sameSite: 'none' as const,
+          sameSite: 'none',
           path: '/',
-          maxAge: maxAge
+          maxAge: maxAge,
         };
         
         // Add domain in production
