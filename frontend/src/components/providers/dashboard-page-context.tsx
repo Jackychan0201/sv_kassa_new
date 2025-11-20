@@ -29,8 +29,10 @@ export const useDashboard = () => {
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
   const router = useRouter();
-  const formattedDate = new Intl.DateTimeFormat("de-DE").format(new Date());
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
+  const formattedDate = new Intl.DateTimeFormat("de-DE").format(yesterday);
   const [record, setRecord] = useState<DailyRecord[] | null>(null);
   const [allRecords, setAllRecords] = useState<DailyRecord[] | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
