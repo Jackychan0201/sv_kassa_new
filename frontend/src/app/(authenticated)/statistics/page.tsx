@@ -26,11 +26,13 @@ const chartOptions = [
   { key: "orderStockValue", label: "Остатки ДОП" },
   { key: "revenueMainWithMargin", label: "Продажи ОСН (С Маржой)" },
   { key: "revenueMainWithoutMargin", label: "Продажи ОСН (Без Маржи)" },
+  { key: "mainMargin", label: "Маржа ОСН" },
   { key: "revenueOrderWithMargin", label: "Продажи ДОП (С Маржой)" },
   { key: "revenueOrderWithoutMargin", label: "Продажи ДОП (Без Маржи)" },
-  { key: "mainMargin", label: "Маржа ОСН" },
   { key: "orderMargin", label: "Маржа ДОП" },
-  { key: "totalRevenue", label: "Общие продажи" },
+  { key: "totalMargin", label: "Общая Маржа" },
+  { key: "totalRevenueWithMargin", label: "Общие Продажи (С Маржой)" },
+  { key: "totalRevenueWithoutMargin", label: "Общие Продажи (Без Маржи)" },
 ] as const
 
 const lineColors = [
@@ -401,8 +403,17 @@ export default function StatisticsPage() {
         return rec.revenueMainWithMargin - rec.revenueMainWithoutMargin
       case "orderMargin":
         return rec.revenueOrderWithMargin - rec.revenueOrderWithoutMargin
-      case "totalRevenue":
+      case "totalRevenueWithMargin":
         return rec.revenueMainWithMargin + rec.revenueOrderWithMargin
+      case "totalRevenueWithoutMargin":
+        return rec.revenueMainWithoutMargin + rec.revenueOrderWithoutMargin
+      case "totalMargin":
+        return (
+          rec.revenueMainWithMargin +
+          rec.revenueOrderWithMargin -
+          rec.revenueMainWithoutMargin -
+          rec.revenueOrderWithoutMargin
+        )
       default:
         return (rec[metric as keyof DailyRecord] as number) ?? 0
     }
