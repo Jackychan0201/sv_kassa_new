@@ -18,6 +18,10 @@ function DashboardContent() {
   const { record, allRecords, shops, notClosedShopNames, selectedShopId, setSelectedShopId, reloadData } =
     useDashboard()
 
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const formattedYesterday = new Intl.DateTimeFormat("de-DE").format(yesterday);
+
   const formattedDate = new Intl.DateTimeFormat("ru-RU").format(new Date())
 
   if (!user) return <LoadingFallback message="Загрузка пользователя..." />
@@ -58,17 +62,17 @@ function DashboardContent() {
 
   if (user.role === "SHOP") {
     const isClosed = recordData[0] !== null
-    dayStatusLabel = isClosed ? "Смена закрыта успешно!" : "Смена не закрыта!"
+    dayStatusLabel = isClosed ? "Смена за вчера закрыта успешно!" : "Смена за вчера не закрыта!"
     dayStatusColor = isClosed ? "text-[#009908]" : "text-[#960000]"
   } else if (user.role === "CEO") {
     if (!allRecords) {
       dayStatusLabel = "Загрузка данных..."
       dayStatusColor = "text-[var(--color-text-thirdly)]"
     } else if (notClosedShopNames.length === 0) {
-      dayStatusLabel = "Все магазины закрыли смену"
+      dayStatusLabel = "Все магазины закрыли смену за вчера!"
       dayStatusColor = "text-[#009908]"
     } else {
-      dayStatusLabel = `Не все магазины закрыли смену: ${notClosedShopNames.join(", ")}`
+      dayStatusLabel = `Не все магазины закрыли смену за вчера: ${notClosedShopNames.join(", ")}`
       dayStatusColor = "text-[#960000]"
     }
   }
@@ -134,7 +138,7 @@ function DashboardContent() {
                   <div className="text-2xl font-bold">
                     {metric.value !== null ? `${metric.value.toFixed(2)}` : "N/A"}
                   </div>
-                  <p className="text-xs text-[var(--color-text-thirdly)] mt-1">{formattedDate}</p>
+                  <p className="text-xs text-[var(--color-text-thirdly)] mt-1">{formattedYesterday}</p>
                 </CardContent>
               </Card>
             )
@@ -153,7 +157,7 @@ function DashboardContent() {
         <div className="flex flex-wrap gap-3">
           {/* Integrated CloseDaySheet for both CEO and SHOP */}
           <CloseDaySheet
-            formattedDate={formattedDate}
+            formattedDate={formattedYesterday}
             onSaved={reloadData}
             disabled={closeDayDisabled}
           />
