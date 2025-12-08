@@ -5,6 +5,7 @@ import databaseConfig from './config/database.config';
 import { Shop } from './shops/shop.entity';
 import { DailyRecord } from './daily-records/daily-record.entity';
 import { ShopsModule } from './shops/shops.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { DailyRecordsModule } from './daily-records/daily-records.module';
 import jwtConfig from './config/jwt.config';
@@ -36,6 +37,8 @@ import { APP_GUARD } from '@nestjs/core';
     ShopsModule,
     AuthModule,
     DailyRecordsModule,
+    // Analytics module provides Prophet forecasts
+    AnalyticsModule,
   ],
   providers: [
     {

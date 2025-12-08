@@ -419,3 +419,28 @@ export const updateShopAccount = async (shopId: string, data: UpdateShopAccountD
     handleError(error, "Failed to update account"); 
   } 
 };
+
+export const getProphetForecast = async (shopId?: string, periods = 30, metric?: string) => {
+  try {
+    const timestamp = Date.now();
+    const shopQuery = shopId ? `&shopId=${shopId}` : "";
+    const metricQuery = metric ? `&metric=${encodeURIComponent(metric)}` : "";
+    const query = `/api/analytics/prophet?periods=${periods}${shopQuery}${metricQuery}&t=${timestamp}`;
+
+    const res = await fetch(query, {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.message || "Failed to fetch forecast");
+    }
+
+    return res.json();
+  } catch (err) {
+    throw err;
+  }
+};
+
