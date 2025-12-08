@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { DailyRecord } from "@/lib/types";
 import { apiRequest } from "@/lib/api-client";
 
 export async function GET(req: NextRequest) {
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     const dates: string[] = [];
     const values: number[] = [];
 
-    records.forEach((r: any) => {
+    records.forEach((r: DailyRecord) => {
       const [day, month, year] = r.recordDate.split(".");
       dates.push(`${year}-${month}-${day}`);
       let value = 0;

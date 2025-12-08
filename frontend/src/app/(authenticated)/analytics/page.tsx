@@ -38,6 +38,13 @@ interface ChartDataPoint {
   type: "actual" | "predicted"
 }
 
+interface ProphetForecastItem {
+  ds: string
+  yhat: number
+  yhat_lower?: number
+  yhat_upper?: number
+}
+
 export default function AnalyticsPage() {
   const { user } = useUser()
   const router = useRouter()
@@ -152,7 +159,7 @@ export default function AnalyticsPage() {
       })
 
       if (predictions && predictions.forecast && Array.isArray(predictions.forecast)) {
-        predictions.forecast.forEach((pred: any) => {
+        predictions.forecast.forEach((pred: ProphetForecastItem) => {
           // Prophet service returns ds (date string in YYYY-MM-DD format)
           const forecastDateStr = pred.ds;
           // Convert YYYY-MM-DD to DD.MM.YYYY for consistency
