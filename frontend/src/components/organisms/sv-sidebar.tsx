@@ -51,11 +51,11 @@ export function SVSidebar() {
   const links = [
     { key: "dashboard", label: "Домашняя", href: "/dashboard", icon: LayoutDashboard },
     { key: "statistics", label: "Статистика", href: "/statistics", icon: BarChart3 },
-    { key: "analytics", label: "Аналитика", href: "/analytics", icon: TrendingUp },
   ];
 
   if (user.user.role === "CEO") {
     links.push({ key: "shops", label: "Магазины", href: "/shops", icon: Store });
+    links.push({ key: "analytics", label: "Аналитика", href: "/analytics", icon: TrendingUp });
   }
 
   return (
