@@ -25,7 +25,8 @@ import {
   Store,
   User,
   LogOut,
-} from "lucide-react";
+  } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import { logout } from "@/lib/api";
 import { useUser } from "../providers/user-provider";
 import { handleError } from "@/lib/utils";
@@ -50,6 +51,7 @@ export function SVSidebar() {
   const links = [
     { key: "dashboard", label: "Домашняя", href: "/dashboard", icon: LayoutDashboard },
     { key: "statistics", label: "Статистика", href: "/statistics", icon: BarChart3 },
+    { key: "analytics", label: "Аналитика", href: "/analytics", icon: TrendingUp },
   ];
 
   if (user.user.role === "CEO") {
