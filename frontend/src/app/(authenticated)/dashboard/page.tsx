@@ -20,7 +20,7 @@ function DashboardContent() {
 
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const formattedYesterday = new Intl.DateTimeFormat("de-DE").format(yesterday);
+  const formattedYesterday = new Intl.DateTimeFormat("ru-RU").format(yesterday);
 
   const formattedDate = new Intl.DateTimeFormat("ru-RU").format(new Date())
 
