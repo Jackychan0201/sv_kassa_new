@@ -57,7 +57,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
     const loadShops = async () => {
       if (!user || !sheetOpen) return
 
-      if (user.role === "CEO") {
+      if (user.role === "CEO" || user.role === "READ") {
         try {
           const allShops = await getAllShops()
           setShops(
@@ -86,7 +86,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
   // Automatically load record when date or shop changes
   useEffect(() => {
     const autoLoadRecord = async () => {
-      if (!selectedDate || (user?.role === "CEO" && !selectedShop)) return
+      if (!selectedDate || ((user?.role === "CEO" || user?.role === "READ") && !selectedShop)) return
 
       const formattedDate = `${selectedDate.getDate().toString().padStart(2, "0")}.${(
         selectedDate.getMonth() + 1
@@ -146,7 +146,7 @@ export function EditDaySheet({ onSaved }: EditDaySheetProps) {
     setSheetOpen(isOpen)
     if (!isOpen) {
       setSelectedDate(null)
-      if (user?.role === "CEO") setSelectedShop(null)
+      if (user?.role === "CEO" || user?.role === "READ") setSelectedShop(null)
       setRecord(null)
       setDataLoaded(false)
       handleReset()

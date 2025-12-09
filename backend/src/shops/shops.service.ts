@@ -49,12 +49,12 @@ export class ShopsService {
     id: string,
     dto: UpdateShopDto,
   ): Promise<{ shop: Shop; token?: string }> {
-    if (user.role !== ShopRole.CEO && user.shopId !== id) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to update this shop');
     }
 
-    if (dto.role && user.role !== ShopRole.CEO) {
-      throw new ForbiddenException('Only CEO can change shop roles');
+    if (dto.role && user.role !== ShopRole.CEO && user.role !== ShopRole.READ) {
+      throw new ForbiddenException('Only CEO or READ can change shop roles');
     }
 
     const shop = await this.shopRepository.findOne({ where: { id } });
@@ -89,7 +89,7 @@ export class ShopsService {
   }
 
   async deleteShop(user: JwtShop, id: string): Promise<void> {
-    if (user.role !== ShopRole.CEO && user.shopId !== id) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to delete this shop');
     }
 
@@ -106,7 +106,7 @@ export class ShopsService {
   }
 
   async findById(user: JwtShop, id: string): Promise<Shop> {
-    if (user.role !== ShopRole.CEO && user.shopId !== id) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && user.shopId !== id) {
       throw new ForbiddenException('You are not allowed to fetch another shop info');
     }
 
@@ -135,7 +135,7 @@ export class ShopsService {
   }
 
   async findByName(user: JwtShop, name: string): Promise<Shop> {
-    if (user.role !== ShopRole.CEO && user.name !== name) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && user.name !== name) {
       throw new ForbiddenException('You are not allowed to fetch another shop info');
     }
 

@@ -98,7 +98,7 @@ export default function StatisticsPage() {
         if (user.role === "SHOP") {
           const records = await getRecordsByRange(fromDateStr, toDateStr)
           setDailyRecords(records)
-        } else if (user.role === "CEO") {
+        } else if (user.role === "CEO" || user.role === "READ") {
           const allShops = await getAllShops()
           const filteredShops = allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name))
           setShops(filteredShops)
@@ -190,12 +190,12 @@ export default function StatisticsPage() {
   if (!user) return <LoadingFallback message="Загрузка данных пользователя..." />
   if (error) return <Label className="text-red-500">Error: {error}</Label>
   if (!dailyRecords && user.role === "SHOP") return <LoadingFallback message="Загрузка данных..." />
-  if (!allRecords && user.role === "CEO") return <LoadingFallback message="Загрузка данных магазинов..." />
+  if (!allRecords && (user.role === "CEO" || user.role === "READ")) return <LoadingFallback message="Загрузка данных магазинов..." />
 
   let recordsToUse: DailyRecord[] = []
   if (user.role === "SHOP") {
     recordsToUse = dailyRecords!
-  } else if (user.role === "CEO") {
+  } else if (user.role === "CEO" || user.role === "READ") {
     if (selectedShopId === "ALL") {
       recordsToUse = allRecords ?? []
     } else {
@@ -454,7 +454,7 @@ export default function StatisticsPage() {
       {/* CONTENT */}
       <div className="flex flex-1 flex-col gap-6 p-6">
         {/* CEO shop selector */}
-        {user.role === "CEO" && (
+        {(user.role === "CEO" || user.role === "READ") && (
           <div>
             <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Выберите магазин</Label>
             <Select value={selectedShopId} onValueChange={setSelectedShopId}>
