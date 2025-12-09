@@ -64,7 +64,10 @@ function DashboardContent() {
     const isClosed = recordData[0] !== null
     dayStatusLabel = isClosed ? "Смена за вчера закрыта успешно!" : "Смена за вчера не закрыта!"
     dayStatusColor = isClosed ? "text-[#009908]" : "text-[#960000]"
-  } else if (user.role === "CEO") {
+  } else if (user.role === "CEO" || user.role === "READ") {
+    
+    
+    
     if (!allRecords) {
       dayStatusLabel = "Загрузка данных..."
       dayStatusColor = "text-[var(--color-text-thirdly)]"
@@ -102,7 +105,7 @@ function DashboardContent() {
       {/* CONTENT */}
       <div className="flex flex-1 flex-col gap-6 p-6">
         {/* CEO Shop Selector */}
-        {user.role === "CEO" && (
+        {(user.role === "CEO" || user.role === "READ") && (
           <div>
             <Label className="mb-1 text-lg text-[var(--color-text-primary)]">Выберите магазин</Label>
             <Select value={selectedShopId} onValueChange={setSelectedShopId}>
@@ -155,14 +158,16 @@ function DashboardContent() {
 
         {/* ACTION BUTTONS */}
         <div className="flex flex-wrap gap-3">
-          {/* Integrated CloseDaySheet for both CEO and SHOP */}
-          <CloseDaySheet
-            formattedDate={formattedYesterday}
-            onSaved={reloadData}
-            disabled={closeDayDisabled}
-          />
-          <EditDaySheet onSaved={reloadData} />
-          <SetReminderDialog />
+          { user.role !== "READ" && (
+          <>
+            <CloseDaySheet
+              formattedDate={formattedYesterday}
+              onSaved={reloadData}
+              disabled={closeDayDisabled} />
+            <EditDaySheet onSaved={reloadData} />
+            <SetReminderDialog />
+          </>)
+          }
         </div>
       </div>
     </SidebarInset>

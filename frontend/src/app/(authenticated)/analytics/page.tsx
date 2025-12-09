@@ -82,7 +82,7 @@ export default function AnalyticsPage() {
         if (user.role === "SHOP") {
           setSelectedShopId("current")
           await loadChartData("current", selectedMetric)
-        } else if (user.role === "CEO") {
+        } else if (user.role === "CEO" || user.role === "READ") {
           const allShops = await getAllShops()
           const filteredShops = allShops.filter((s) => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name))
           setShops(filteredShops)
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
         {/* Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Shop Selector */}
-          {user.role === "CEO" && shops.length > 0 && (
+          {(user.role === "CEO" || user.role === "READ") && shops.length > 0 && (
             <div>
               <Label className="mb-1 text-sm text-[var(--color-text-primary)]">Выберите магазин</Label>
               <Select value={selectedShopId} onValueChange={handleShopChange}>

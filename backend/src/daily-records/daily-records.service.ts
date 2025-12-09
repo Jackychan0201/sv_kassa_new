@@ -35,8 +35,8 @@ export class DailyRecordsService {
       throw new ForbiddenException('You don\'t have access to this shop data');
     }
 
-    if (user.role === ShopRole.CEO && !dto.shopId) {
-      throw new ForbiddenException('CEO must specify a shopId');
+    if ((user.role === ShopRole.CEO || user.role === ShopRole.READ) && !dto.shopId) {
+      throw new ForbiddenException('CEO or READ must specify a shopId');
     }
 
     const shop = await this.shopRepo.findOne({ where: { id: dto.shopId }, select: ['id'] });
@@ -80,7 +80,7 @@ export class DailyRecordsService {
       throw new NotFoundException(`Daily record with id ${recordId} not found`);
     }
     
-    if (user.role !== ShopRole.CEO && record.shopId !== user.shopId) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && record.shopId !== user.shopId) {
       throw new ForbiddenException('You are not allowed to access this record');
     }
 
@@ -142,7 +142,7 @@ export class DailyRecordsService {
 
     let records: DailyRecord[];
 
-    if (user.role === ShopRole.CEO && !shopId) {
+    if ((user.role === ShopRole.CEO || user.role === ShopRole.READ) && !shopId) {
       records = await this.dailyRecordRepo.find({
         relations: [],
         order: { createdAt: 'ASC' },
@@ -175,7 +175,7 @@ export class DailyRecordsService {
       throw new NotFoundException(`Daily record with id ${recordId} not found`);
     }
 
-    if (user.role !== ShopRole.CEO && record.shopId !== user.shopId) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && record.shopId !== user.shopId) {
       throw new ForbiddenException('You are not allowed to update this record');
     }
 
@@ -206,7 +206,7 @@ export class DailyRecordsService {
       throw new NotFoundException(`Daily record with id ${recordId} not found`);
     }
 
-    if (user.role !== ShopRole.CEO && record.shopId !== user.shopId) {
+    if (user.role !== ShopRole.CEO && user.role !== ShopRole.READ && record.shopId !== user.shopId) {
       throw new ForbiddenException('You are not allowed to delete this record');
     }
 

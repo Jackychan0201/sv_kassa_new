@@ -144,7 +144,7 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
     const loadShops = async () => {
       if (!user || !sheetOpen) return;
 
-      if (user.role === "CEO") {
+      if (user.role === "CEO" || user.role === "READ") {
         try {
           const allShops = await getAllShops();
           setShops(allShops.filter(s => s.role === "SHOP").sort((a, b) => a.name.localeCompare(b.name)));
@@ -185,7 +185,7 @@ export function CloseDaySheet({ formattedDate, onSaved, disabled }: CloseDayShee
         </SheetHeader>
 
         {/* Shop selection for CEO */}
-        {user?.role === "CEO" && (
+        {(user?.role === "CEO" || user?.role === "READ") && (
           <div className="ml-6">
             <p className="text-sm mb-2 text-[var(--color-text-primary)]">Выберите магазин</p>
             <Select

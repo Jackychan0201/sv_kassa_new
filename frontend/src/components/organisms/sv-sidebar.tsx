@@ -55,6 +55,9 @@ export function SVSidebar() {
 
   if (user.user.role === "CEO") {
     links.push({ key: "shops", label: "Магазины", href: "/shops", icon: Store });
+  }
+
+  if (user.user.role === "CEO" || user.user.role === "READ") {
     links.push({ key: "analytics", label: "Аналитика", href: "/analytics", icon: TrendingUp });
   }
 

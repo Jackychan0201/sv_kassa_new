@@ -23,8 +23,8 @@ export class ShopsController {
 
   @Get()
   @UseGuards(RolesGuard)
-  @Roles(ShopRole.CEO)
-  @ApiOperation({ summary: 'Get all shops (Allowed only by CEO)' })
+  @Roles(ShopRole.CEO, ShopRole.READ)
+  @ApiOperation({ summary: 'Get all shops (Allowed only by CEO or READ)' })
   @ApiResponse({ status: 200, description: 'List of shops.', type: [Shop] })
   findAll(): Promise<Shop[]> {
     return this.shopsService.findAll();
@@ -32,8 +32,8 @@ export class ShopsController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(ShopRole.CEO)
-  @ApiOperation({ summary: 'Create a new shop (Allowed only by CEO)' })
+  @Roles(ShopRole.CEO, ShopRole.READ)
+  @ApiOperation({ summary: 'Create a new shop (Allowed only by CEO or READ)' })
   @ApiResponse({ status: 201, description: 'Shop created successfully.', type: Shop })
   async create(@Body() dto: CreateShopDto): Promise<Shop> {
     return this.shopsService.createShop(dto);

@@ -44,7 +44,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await getRecordByDate(formattedDate);
       setRecord(data || []);
-      if (user.role === "CEO") setAllRecords(data || []);
+      if (user.role === "CEO" || user.role === "READ") setAllRecords(data || []);
     } catch (err) {
       handleError(err);
       router.push("/login");
@@ -52,7 +52,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const loadShops = async () => {
-    if (!user || user.role !== "CEO") return;
+    if (!user || (user.role !== "CEO" && user.role !== "READ")) return;
     try {
       const allShops = await getAllShops();
       setShops(
@@ -67,7 +67,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resolveNotClosedShops = async () => {
-    if (!user || user.role !== "CEO" || !allRecords || shops.length === 0) return;
+    if (!user || (user.role !== "CEO" && user.role !== "READ") || !allRecords || shops.length === 0) return;
 
     const closedShopIds = allRecords.map((r) => r.shopId);
     const notClosed = shops.filter((s) => !closedShopIds.includes(s.id));
@@ -89,7 +89,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
   const reloadData = () => {
     if (!user) return;
-    if (user.role === "CEO") loadShops();
+    if (user.role === "CEO" || user.role === "READ") loadShops();
     loadRecord();
   };
 
