@@ -12,7 +12,9 @@ export async function GET(req: NextRequest) {
 
   try {
     // Fetch historical records for this shop from backend
-    const recordsRes = await apiRequest(`/daily-records${shopId ? `?shopId=${shopId}` : ""}`, req);
+    // If shopId is "ALL", we don't pass it to the backend so we get all records.
+    const effectiveShopId = shopId === "ALL" ? null : shopId;
+    const recordsRes = await apiRequest(`/daily-records${effectiveShopId ? `?shopId=${effectiveShopId}` : ""}`, req);
     if (!recordsRes.ok) {
       const errorData = await recordsRes.json().catch(() => null);
       return NextResponse.json({ message: (errorData?.message) || "Failed to fetch daily records" }, { status: recordsRes.status });
@@ -20,13 +22,14 @@ export async function GET(req: NextRequest) {
 
     const records = await recordsRes.json();
 
-    // Prepare data for Prophet
-    const dates: string[] = [];
-    const values: number[] = [];
+    // Prepare data for Prophet - Aggregate by date first
+    const dailyMap = new Map<string, number>();
 
     records.forEach((r: DailyRecord) => {
+      // API returns DD.MM.YYYY, Prophet wants YYYY-MM-DD
       const [day, month, year] = r.recordDate.split(".");
-      dates.push(`${year}-${month}-${day}`);
+      const dateKey = `${year}-${month}-${day}`;
+
       let value = 0;
       switch (metric) {
         case "mainStockValue": value = r.mainStockValue ?? 0; break;
@@ -42,7 +45,19 @@ export async function GET(req: NextRequest) {
         case "totalMargin": value = (r.revenueMainWithMargin ?? 0) + (r.revenueOrderWithMargin ?? 0) - (r.revenueMainWithoutMargin ?? 0) - (r.revenueOrderWithoutMargin ?? 0); break;
         default: value = r.revenueMainWithMargin ?? 0;
       }
-      values.push(Number(value.toFixed(2)));
+
+      dailyMap.set(dateKey, (dailyMap.get(dateKey) || 0) + value);
+    });
+
+    const dates: string[] = [];
+    const values: number[] = [];
+
+    // Sort by date to be safe, though Prophet handles unsorted it's better to be clean
+    const sortedDates = Array.from(dailyMap.keys()).sort();
+
+    sortedDates.forEach(date => {
+      dates.push(date);
+      values.push(Number((dailyMap.get(date) || 0).toFixed(2)));
     });
 
     // Call Prophet service
