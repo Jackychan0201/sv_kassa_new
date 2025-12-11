@@ -53,7 +53,15 @@ interface MergedRecord {
   [shopId: string]: string | number
 }
 
-const CustomXAxisTick = (props: any) => {
+interface CustomXAxisTickProps {
+  x: number
+  y: number
+  payload: {
+    value: string
+  }
+}
+
+const CustomXAxisTick = (props: CustomXAxisTickProps) => {
   const { x, y, payload } = props
   const dateStr = payload.value
 
@@ -916,7 +924,7 @@ export default function StatisticsPage() {
                           <XAxis
                             dataKey="recordDate"
                             interval="preserveStartEnd"
-                            tick={<CustomXAxisTick />}
+                            tick={CustomXAxisTick}
                             angle={-30}
                             tickLine={false}
                             axisLine={false}
