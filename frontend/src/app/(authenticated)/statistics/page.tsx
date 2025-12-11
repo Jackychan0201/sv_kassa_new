@@ -835,73 +835,77 @@ export default function StatisticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-4 flex-wrap items-end">
-              <DatePicker title="От" value={chartFromDate} onChange={setChartFromDate} />
-              <DatePicker title="До" value={chartToDate} onChange={setChartToDate} />
-              <div>
-                <p className="text-sm mb-1">Выберите метрику</p>
-                <Select
-                  value={selectedMetric ?? undefined}
-                  onValueChange={(val) => setSelectedMetric(val as (typeof chartOptions)[number]["key"])}
-                >
-                  <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
-                    <SelectValue placeholder="Выберите метрику" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
-                    {chartOptions.map((opt) => (
-                      <SelectItem key={opt.key} value={opt.key}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleChartFetch}
-                  className="transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
-                >
-                  Получить График
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row gap-6">
-              {user?.role === "CEO" && shops.length > 0 && (
-                <div className="w-full lg:w-55 shrink-0 space-y-2">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Список Магазинов</p>
-                  <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg-main)]">
-                    <ScrollArea className="h-[35vh]">
-                      <div className="flex flex-col gap-2 p-4 min-w-max">
-                        {shops.map((shop, idx) => (
-                          <label
-                            key={shop.id}
-                            className="flex items-center gap-2 p-2 hover:bg-[var(--color-bg-secondary)] rounded-md cursor-pointer transition-colors"
-                          >
-                            <Checkbox
-                              checked={selectedShops.includes(shop.id)}
-                              onCheckedChange={(checked) => toggleShop(shop.id, !!checked)}
-                            />
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="w-3 h-3 rounded-full shrink-0"
-                                style={{
-                                  backgroundColor: lineColors[idx % lineColors.length],
-                                }}
-                              ></span>
-                              <span className="text-sm whitespace-nowrap" title={shop.name}>
-                                {shop.name} {latestShopValues[shop.id] !== undefined ? `(${latestShopValues[shop.id].toFixed(2)})` : ""}
-                              </span>
-                            </div>
-                          </label>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col lg:flex-row gap-6 items-start">
+                <div className="flex flex-col gap-4 min-w-[200px] shrink-0">
+                  <DatePicker title="От" value={chartFromDate} onChange={setChartFromDate} />
+                  <DatePicker title="До" value={chartToDate} onChange={setChartToDate} />
+                  <div>
+                    <p className="text-sm mb-1 text-[var(--color-text-primary)]">Выберите метрику</p>
+                    <Select
+                      value={selectedMetric ?? undefined}
+                      onValueChange={(val) => setSelectedMetric(val as (typeof chartOptions)[number]["key"])}
+                    >
+                      <SelectTrigger className="w-48 justify-between bg-[var(--color-bg-select-trigger)] border-0 text-[var(--color-text-primary)] hover:bg-[var(--color-bg-select-hover)] hover:text-[var(--color-text-primary)]">
+                        <SelectValue placeholder="Выберите метрику" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
+                        {chartOptions.map((opt) => (
+                          <SelectItem key={opt.key} value={opt.key}>
+                            {opt.label}
+                          </SelectItem>
                         ))}
-                      </div>
-                    </ScrollArea>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  <Button
+                    onClick={handleChartFetch}
+                    className="w-48 transition bg-[var(--color-button-bg)] text-[var(--color-text-primary)] hover:bg-[var(--color-button-bg-hover-type2)]"
+                  >
+                    Получить График
+                  </Button>
                 </div>
-              )}
+                {user?.role === "CEO" && shops.length > 0 && (
+                  <div className="flex-1 w-full min-w-0 space-y-2">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">Список Магазинов</p>
+                    <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg-main)]">
+                      <ScrollArea className="h-[35vh]">
+                        <div className="flex flex-col gap-2 p-4 min-w-max">
+                          {shops.map((shop, idx) => (
+                            <label
+                              key={shop.id}
+                              className="flex items-center gap-2 p-2 hover:bg-[var(--color-bg-secondary)] rounded-md cursor-pointer transition-colors"
+                            >
+                              <Checkbox
+                                checked={selectedShops.includes(shop.id)}
+                                onCheckedChange={(checked) => toggleShop(shop.id, !!checked)}
+                              />
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <span
+                                  className="w-3 h-3 rounded-full shrink-0"
+                                  style={{
+                                    backgroundColor: lineColors[idx % lineColors.length],
+                                  }}
+                                ></span>
+                                <span className="text-sm whitespace-nowrap flex-1" title={shop.name}>
+                                  {shop.name}
+                                </span>
+                                {latestShopValues[shop.id] !== undefined && (
+                                  <span className="text-sm font-mono tabular-nums text-right ml-4">
+                                    {Math.round(latestShopValues[shop.id]).toLocaleString("ru-RU")}
+                                  </span>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              <div className="flex-1 min-w-0">
+              <div className="w-full min-w-0">
                 {chartLoading && (
                   <div className="h-[40vh] flex items-center justify-center">
                     <LoadingFallback message="Загрузка графика..." />
@@ -986,8 +990,8 @@ export default function StatisticsPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
-      </div>
-    </SidebarInset>
+        </Card >
+      </div >
+    </SidebarInset >
   )
 }
