@@ -53,6 +53,32 @@ interface MergedRecord {
   [shopId: string]: string | number
 }
 
+const CustomXAxisTick = (props: any) => {
+  const { x, y, payload } = props
+  const dateStr = payload.value
+
+  const [day, month, year] = dateStr.split(".").map(Number)
+  const date = new Date(year, month - 1, day)
+  const dayOfWeek = date.getDay()
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="end"
+        fontSize={12}
+        style={{ fill: isWeekend ? "var(--color-caution)" : "var(--color-text-thirdly)" }}
+        transform="rotate(-30)"
+      >
+        {dateStr}
+      </text>
+    </g>
+  )
+}
+
 export default function StatisticsPage() {
   const { user } = useUser()
   const router = useRouter()
@@ -204,7 +230,7 @@ export default function StatisticsPage() {
   }
 
   if (recordsToUse.length === 0) {
-    return(
+    return (
       <div className="flex flex-1 items-center justify-center bg-[var(--color-bg-main)] w-full h-full">
         <div
           className="flex flex-col items-center justify-center gap-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-secondary)] p-6 shadow-md"
@@ -369,11 +395,11 @@ export default function StatisticsPage() {
   }
 
   const kpiMetrics = [
-    { 
-      label: "GMROI", 
-      value: gmroi.toFixed(2), 
-      icon: Target, 
-      description: "Валовая рентабельность инвестиций в запасы" 
+    {
+      label: "GMROI",
+      value: gmroi.toFixed(2),
+      icon: Target,
+      description: "Валовая рентабельность инвестиций в запасы"
     },
     {
       label: "Ежедневный рост выручки",
@@ -387,11 +413,11 @@ export default function StatisticsPage() {
       icon: Activity,
       description: "Раз в год",
     },
-    { 
-      label: "Общая маржа", 
-      value: `${overallMargin.toFixed(2)}%`, 
-      icon: Percent, 
-      description: "Процент" 
+    {
+      label: "Общая маржа",
+      value: `${overallMargin.toFixed(2)}%`,
+      icon: Percent,
+      description: "Процент"
     },
   ]
   const selectedOption = chartOptions.find((opt) => opt.key === selectedMetric)
@@ -419,10 +445,34 @@ export default function StatisticsPage() {
     }
   }
 
+  const latestShopValues: Record<string, number> = {}
   if (chartRecords && selectedMetric) {
+    // chartRecords might not be sorted by date, but usually they come sorted from backend. 
+    // We can rely on recordDate. Or better, just parse and sort if needed.
+    // However, for simplicity and performance, assuming we want the "latest available" 
+    // record for each shop, we can iterate.
+    // If we want the value at the END of the chart range, we should prioritize later dates.
+
+    // Let's sort a copy of chartRecords by date just to be sure
+    const sortedRecords = [...chartRecords].sort((a, b) => {
+      const [d1, m1, y1] = a.recordDate.split('.').map(Number)
+      const [d2, m2, y2] = b.recordDate.split('.').map(Number)
+      return new Date(y1, m1 - 1, d1).getTime() - new Date(y2, m2 - 1, d2).getTime()
+    })
+
+    const isMarginMetric = ["mainMargin", "orderMargin", "totalMargin"].includes(selectedMetric)
+
+    for (const rec of sortedRecords) {
+      if (isMarginMetric) {
+        latestShopValues[rec.shopId] = (latestShopValues[rec.shopId] || 0) + getMetricValue(rec, selectedMetric)
+      } else {
+        latestShopValues[rec.shopId] = getMetricValue(rec, selectedMetric)
+      }
+    }
+
     if (user?.role === "CEO") {
       mergedData = Object.values(
-        chartRecords.reduce(
+        sortedRecords.reduce(
           (acc, rec) => {
             if (!acc[rec.recordDate]) acc[rec.recordDate] = { recordDate: rec.recordDate }
             const value = getMetricValue(rec, selectedMetric)
@@ -433,7 +483,7 @@ export default function StatisticsPage() {
         ),
       )
     } else {
-      mergedData = chartRecords.map((rec) => ({
+      mergedData = sortedRecords.map((rec) => ({
         recordDate: rec.recordDate,
         [selectedMetric]: getMetricValue(rec, selectedMetric),
       }))
@@ -452,7 +502,7 @@ export default function StatisticsPage() {
       </header>
 
       {/* CONTENT */}
-      <div className="flex flex-1 flex-col gap-6 p-6">
+      <div className="flex flex-1 flex-col gap-6 p-6 w-[100%]">
         {/* CEO shop selector */}
         {(user.role === "CEO" || user.role === "READ") && (
           <div>
@@ -514,11 +564,10 @@ export default function StatisticsPage() {
                     {mainStats.revenueWithMargin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(mainStats.revenueWithMargin.avg, mainStatsWithoutToday.revenueWithMargin.avg)
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(mainStats.revenueWithMargin.avg, mainStatsWithoutToday.revenueWithMargin.avg)
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {mainStats.revenueWithMargin.avg.toFixed(2)}
                   </div>
@@ -533,11 +582,10 @@ export default function StatisticsPage() {
                     {mainStats.revenueWithoutMargin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(mainStats.revenueWithoutMargin.avg, mainStatsWithoutToday.revenueWithoutMargin.avg)
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(mainStats.revenueWithoutMargin.avg, mainStatsWithoutToday.revenueWithoutMargin.avg)
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {mainStats.revenueWithoutMargin.avg.toFixed(2)}
                   </div>
@@ -551,11 +599,10 @@ export default function StatisticsPage() {
                     Макс: {mainStats.margin.max.toFixed(2)} | Мин: {mainStats.margin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(mainStats.margin.avg, mainStatsWithoutToday.margin.avg)
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(mainStats.margin.avg, mainStatsWithoutToday.margin.avg)
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {mainStats.margin.avg.toFixed(2)}
                   </div>
@@ -565,11 +612,10 @@ export default function StatisticsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[var(--color-text-thirdly)]">Средние Остатки</span>
                 <div
-                  className={`text-sm font-semibold ${
-                    compareMetric(mainStats.avgStock.avg, mainStatsWithoutToday.avgStock.avg)
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
+                  className={`text-sm font-semibold ${compareMetric(mainStats.avgStock.avg, mainStatsWithoutToday.avgStock.avg)
+                    ? "text-green-500"
+                    : "text-red-500"
+                    }`}
                 >
                   {mainStats.avgStock.avg.toFixed(2)}
                 </div>
@@ -594,11 +640,10 @@ export default function StatisticsPage() {
                     {orderStats.revenueWithMargin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(orderStats.revenueWithMargin.avg, orderStatsWithoutToday.revenueWithMargin.avg)
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(orderStats.revenueWithMargin.avg, orderStatsWithoutToday.revenueWithMargin.avg)
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {orderStats.revenueWithMargin.avg.toFixed(2)}
                   </div>
@@ -613,14 +658,13 @@ export default function StatisticsPage() {
                     {orderStats.revenueWithoutMargin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(
-                        orderStats.revenueWithoutMargin.avg,
-                        orderStatsWithoutToday.revenueWithoutMargin.avg,
-                      )
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(
+                      orderStats.revenueWithoutMargin.avg,
+                      orderStatsWithoutToday.revenueWithoutMargin.avg,
+                    )
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {orderStats.revenueWithoutMargin.avg.toFixed(2)}
                   </div>
@@ -634,11 +678,10 @@ export default function StatisticsPage() {
                     Макс: {orderStats.margin.max.toFixed(2)} | Мин: {orderStats.margin.min.toFixed(2)}
                   </div>
                   <div
-                    className={`text-sm font-semibold ${
-                      compareMetric(orderStats.margin.avg, orderStatsWithoutToday.margin.avg)
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${compareMetric(orderStats.margin.avg, orderStatsWithoutToday.margin.avg)
+                      ? "text-green-500"
+                      : "text-red-500"
+                      }`}
                   >
                     Средняя: {orderStats.margin.avg.toFixed(2)}
                   </div>
@@ -648,11 +691,10 @@ export default function StatisticsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[var(--color-text-thirdly)]">Средние Остатки</span>
                 <div
-                  className={`text-sm font-semibold ${
-                    compareMetric(orderStats.avgStock.avg, orderStatsWithoutToday.avgStock.avg)
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
+                  className={`text-sm font-semibold ${compareMetric(orderStats.avgStock.avg, orderStatsWithoutToday.avgStock.avg)
+                    ? "text-green-500"
+                    : "text-red-500"
+                    }`}
                 >
                   {orderStats.avgStock.avg.toFixed(2)}
                 </div>
@@ -816,57 +858,85 @@ export default function StatisticsPage() {
               </div>
             </div>
 
-            {user?.role === "CEO" && shops.length > 0 && (
-              <div>
-                <p className="text-sm mb-2">Выберите магазины</p>
-                <div className="flex flex-wrap gap-4">
-                  {shops.map((shop, idx) => (
-                    <label key={shop.id} className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedShops.includes(shop.id)}
-                        onCheckedChange={(checked) => toggleShop(shop.id, !!checked)}
-                      />
-                      <span className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full"
-                          style={{
-                            backgroundColor: lineColors[idx % lineColors.length],
-                          }}
-                        ></span>
-                        {shop.name}
-                      </span>
-                    </label>
-                  ))}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {user?.role === "CEO" && shops.length > 0 && (
+                <div className="w-full lg:w-55 shrink-0 space-y-2">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Список Магазинов</p>
+                  <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg-main)]">
+                    <ScrollArea className="h-[35vh]">
+                      <div className="flex flex-col gap-2 p-4 min-w-max">
+                        {shops.map((shop, idx) => (
+                          <label
+                            key={shop.id}
+                            className="flex items-center gap-2 p-2 hover:bg-[var(--color-bg-secondary)] rounded-md cursor-pointer transition-colors"
+                          >
+                            <Checkbox
+                              checked={selectedShops.includes(shop.id)}
+                              onCheckedChange={(checked) => toggleShop(shop.id, !!checked)}
+                            />
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="w-3 h-3 rounded-full shrink-0"
+                                style={{
+                                  backgroundColor: lineColors[idx % lineColors.length],
+                                }}
+                              ></span>
+                              <span className="text-sm whitespace-nowrap" title={shop.name}>
+                                {shop.name} {latestShopValues[shop.id] !== undefined ? `(${latestShopValues[shop.id].toFixed(2)})` : ""}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div>
-              {chartLoading && <p>Loading...</p>}
-              {!chartLoading && chartRecords && chartRecords.length > 0 && selectedMetric && (
-                <div className="w-full">
-                  <ChartContainer
-                    className="h-[40vh] w-full"
-                    config={{
-                      [selectedMetric]: {
-                        label: selectedOption?.label || "Value",
-                        color: "#8884d8",
-                      },
-                    }}
-                  >
-                    <div className="h-[35vh]">
+              <div className="flex-1 min-w-0">
+                {chartLoading && (
+                  <div className="h-[40vh] flex items-center justify-center">
+                    <LoadingFallback message="Загрузка графика..." />
+                  </div>
+                )}
+                {!chartLoading && chartRecords && chartRecords.length > 0 && selectedMetric && (
+                  <div className="w-full">
+                    <ChartContainer
+                      className="h-[40vh] w-full"
+                      config={{
+                        [selectedMetric]: {
+                          label: selectedOption?.label || "Value",
+                          color: "#8884d8",
+                        },
+                      }}
+                    >
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mergedData} margin={{ bottom: 20, right: 10, top: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
+                        <LineChart data={mergedData} margin={{ bottom: 20, right: 30, top: 5, left: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                           <XAxis
                             dataKey="recordDate"
-                            interval={0}
-                            tick={{ fontSize: 12 }}
+                            interval="preserveStartEnd"
+                            tick={<CustomXAxisTick />}
                             angle={-30}
-                            textAnchor="end"
+                            tickLine={false}
+                            axisLine={false}
+                            dy={10}
                           />
-                          <YAxis />
-                          <ChartTooltip content={<ChartTooltipContent hideIndicator={true} />} />
+                          <YAxis
+                            tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
+                            tickLine={false}
+                            axisLine={false}
+                            tickFormatter={(value) => `${value}`}
+                          />
+                          <ChartTooltip
+                            contentStyle={{
+                              backgroundColor: "var(--color-bg-secondary)",
+                              border: "1px solid var(--color-border)",
+                              borderRadius: "8px",
+                              color: "var(--color-text-primary)",
+                            }}
+                            content={<ChartTooltipContent hideIndicator={true} />}
+                          />
 
                           {user?.role === "CEO" &&
                             shops.map(
@@ -878,8 +948,9 @@ export default function StatisticsPage() {
                                     dataKey={shop.id}
                                     name={shop.name}
                                     stroke={lineColors[idx % lineColors.length]}
+                                    dot={{ r: 2 }}
+                                    activeDot={{ r: 4 }}
                                     strokeWidth={2}
-                                    dot={{ r: 3 }}
                                   />
                                 ),
                             )}
@@ -890,39 +961,21 @@ export default function StatisticsPage() {
                               dataKey={selectedMetric}
                               stroke="#8884d8"
                               strokeWidth={2}
-                              dot={{ r: 3 }}
+                              dot={false}
+                              activeDot={{ r: 4, strokeWidth: 0 }}
                             />
                           )}
                         </LineChart>
                       </ResponsiveContainer>
-
-                      {user?.role === "CEO" && (
-                        <div className="flex flex-wrap justify-center gap-4 mt-6">
-                          {shops
-                            .filter((shop) => selectedShops.includes(shop.id))
-                            .map((shop, idx) => (
-                              <div
-                                key={shop.id}
-                                className="flex items-center gap-2 text-sm text-[var(--color-text-primary)]"
-                              >
-                                <span
-                                  className="w-3 h-3 rounded-full"
-                                  style={{
-                                    backgroundColor: lineColors[idx % lineColors.length],
-                                  }}
-                                ></span>
-                                <span>{shop.name}</span>
-                              </div>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-                  </ChartContainer>
-                </div>
-              )}
-              {!chartLoading && chartRecords && chartRecords.length === 0 && (
-                <p className="text-[var(--color-text-secondary)] mt-4">No records found in this range.</p>
-              )}
+                    </ChartContainer>
+                  </div>
+                )}
+                {!chartLoading && chartRecords && chartRecords.length === 0 && (
+                  <div className="h-[40vh] flex items-center justify-center border border-dashed border-[var(--color-border)] rounded-lg">
+                    <p className="text-[var(--color-text-secondary)]">Нет данных за выбранный период.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
