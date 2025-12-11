@@ -45,6 +45,40 @@ interface ProphetForecastItem {
   yhat_upper?: number
 }
 
+interface CustomXAxisTickProps {
+  x: number
+  y: number
+  payload: {
+    value: string
+  }
+}
+
+const CustomXAxisTick = (props: CustomXAxisTickProps) => {
+  const { x, y, payload } = props
+  const dateStr = payload.value
+
+  const [day, month, year] = dateStr.split(".").map(Number)
+  const date = new Date(year, month - 1, day)
+  const dayOfWeek = date.getDay()
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="end"
+        fontSize={12}
+        style={{ fill: isWeekend ? "var(--color-caution)" : "var(--color-text-thirdly)" }}
+        transform="rotate(-30)"
+      >
+        {dateStr}
+      </text>
+    </g>
+  )
+}
+
 export default function AnalyticsPage() {
   const { user } = useUser()
   const router = useRouter()
@@ -127,33 +161,38 @@ export default function AnalyticsPage() {
 
     try {
       const today = new Date()
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(today.getDate() - 6)
+      const fromDate = new Date(today.getFullYear(), today.getMonth(), 1)
+      const toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
 
-      const fromDateStr = formatDate(sevenDaysAgo)
-      const toDateStr = formatDate(today)
+      const fromDateStr = formatDate(fromDate)
+      const toDateStr = formatDate(toDate)
 
       const actualRecords = await getRecordsByRange(fromDateStr, toDateStr)
       let filteredRecords = actualRecords
 
-      if (user?.role === "CEO" && shopId !== "ALL") {
+      if ((user?.role === "CEO" || user?.role === "READ") && shopId !== "ALL") {
         filteredRecords = actualRecords.filter((r) => r.shopId === shopId)
       }
 
-      const predictions = await getProphetForecast(shopId === "current" ? undefined : shopId, 7, metric)
-
-      // Log raw inputs/outputs for debugging (frontend console)
-      // eslint-disable-next-line no-console
-      console.debug('analytics.loadChartData: actualRecordsCount=', filteredRecords.length)
-      // eslint-disable-next-line no-console
-      console.debug('analytics.loadChartData: predictions=', predictions)
+      const daysToPredict = Math.max(0, toDate.getDate() - today.getDate())
+      const predictions = daysToPredict > 0
+        ? await getProphetForecast(shopId === "current" ? undefined : shopId, daysToPredict, metric)
+        : null
 
       const data: ChartDataPoint[] = []
 
+      // Aggregate actuals by date
+      const dailyActuals = new Map<string, number>()
       filteredRecords.forEach((rec) => {
+        const val = getMetricValue(rec, metric)
+        const current = dailyActuals.get(rec.recordDate) || 0
+        dailyActuals.set(rec.recordDate, current + val)
+      })
+
+      dailyActuals.forEach((value, date) => {
         data.push({
-          date: rec.recordDate,
-          actual: getMetricValue(rec, metric),
+          date,
+          actual: value,
           type: "actual",
         })
       })
@@ -242,6 +281,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-1 flex-col gap-6 p-6">
         {/* Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           {/* Shop Selector */}
           {(user.role === "CEO" || user.role === "READ") && shops.length > 0 && (
             <div>
@@ -251,6 +291,7 @@ export default function AnalyticsPage() {
                   <SelectValue placeholder="Выберите магазин" />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)] border border-[var(--color-border)]">
+                  <SelectItem value="ALL">Все магазины</SelectItem>
                   {shops.map((shop) => (
                     <SelectItem key={shop.id} value={shop.id}>
                       {shop.name}
@@ -260,6 +301,7 @@ export default function AnalyticsPage() {
               </Select>
             </div>
           )}
+
 
           {/* Metric Selector */}
           <div>
@@ -284,13 +326,13 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              {selectedOption?.label} - Последние 7 дней и прогноз
+              {selectedOption?.label} - Текущий месяц
             </CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex items-center justify-center h-80">
-                <p className="text-[var(--color-text-thirdly)]">Загрузка данных...</p>
+              <div className="h-[40vh] flex items-center justify-center">
+                <LoadingFallback message="Загрузка..." />
               </div>
             ) : chartData.length > 0 ? (
               <ChartContainer config={{}} className="w-full h-80">
@@ -299,11 +341,12 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                     <XAxis
                       dataKey="date"
-                      stroke="var(--color-text-thirdly)"
-                      tick={{ fontSize: 12 }}
-                      interval={0}
+                      interval="preserveStartEnd"
+                      tick={CustomXAxisTick}
                       angle={-30}
-                      textAnchor="end"
+                      tickLine={false}
+                      axisLine={false}
+                      dy={10}
                     />
                     <YAxis
                       stroke="var(--color-text-thirdly)"
@@ -316,15 +359,15 @@ export default function AnalyticsPage() {
                         borderRadius: "8px",
                         color: "var(--color-text-primary)",
                       }}
-                      content={<ChartTooltipContent />}
+                      content={<ChartTooltipContent hideIndicator={true} />}
                     />
                     <Line
                       type="monotone"
                       dataKey="actual"
                       stroke="#8884d8"
                       strokeWidth={2}
-                      dot={{ fill: "#8884d8", r: 4 }}
-                      activeDot={{ r: 6 }}
+                      dot={{ fill: "#8884d8", r: 2 }}
+                      activeDot={{ r: 4 }}
                       name="Фактические данные"
                       connectNulls
                     />
@@ -334,8 +377,8 @@ export default function AnalyticsPage() {
                       stroke="#82ca9d"
                       strokeWidth={2}
                       strokeDasharray="5 5"
-                      dot={{ fill: "#82ca9d", r: 4 }}
-                      activeDot={{ r: 6 }}
+                      dot={{ fill: "#82ca9d", r: 2 }}
+                      activeDot={{ r: 4 }}
                       name="Прогноз"
                       connectNulls
                     />
@@ -360,11 +403,11 @@ export default function AnalyticsPage() {
             <div className="space-y-2 text-sm text-[var(--color-text-thirdly)]">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-1 bg-[#8884d8]"></div>
-                <p>Синяя линия показывает фактические данные за последние 7 дней</p>
+                <p>Синяя линия показывает фактические данные с начала месяца</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-1 bg-[#82ca9d] border-t-2 border-dashed" style={{borderTopStyle: 'dashed'}}></div>
-                <p>Зелёная пунктирная линия показывает прогноз на следующие 7 дней</p>
+                <div className="w-8 h-1 bg-[#82ca9d] border-t-2 border-dashed" style={{ borderTopStyle: 'dashed' }}></div>
+                <p>Зелёная пунктирная линия показывает прогноз до конца месяца</p>
               </div>
               <p className="mt-4 text-xs">Прогнозы основаны на методе Prophet и анализируют исторические данные метрики для предсказания будущих тенденций.</p>
             </div>
