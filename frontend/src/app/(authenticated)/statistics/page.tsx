@@ -468,10 +468,10 @@ export default function StatisticsPage() {
       return new Date(y1, m1 - 1, d1).getTime() - new Date(y2, m2 - 1, d2).getTime()
     })
 
-    const isMarginMetric = ["mainMargin", "orderMargin", "totalMargin"].includes(selectedMetric)
+    const isStockMetrics = ["mainStockValue", "orderStockValue"].includes(selectedMetric)
 
     for (const rec of sortedRecords) {
-      if (isMarginMetric) {
+      if (!isStockMetrics) {
         latestShopValues[rec.shopId] = (latestShopValues[rec.shopId] || 0) + getMetricValue(rec, selectedMetric)
       } else {
         latestShopValues[rec.shopId] = getMetricValue(rec, selectedMetric)
@@ -866,7 +866,7 @@ export default function StatisticsPage() {
                   </Button>
                 </div>
                 {user?.role === "CEO" && shops.length > 0 && (
-                  <div className="flex-1 w-full min-w-0 space-y-2">
+                  <div className="flex flex-col w-90 min-w-0 space-y-2">
                     <p className="text-sm font-medium text-[var(--color-text-primary)]">Список Магазинов</p>
                     <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-bg-main)]">
                       <ScrollArea className="h-[35vh]">
