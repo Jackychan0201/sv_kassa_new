@@ -177,6 +177,7 @@ export function EditShopSheet({
               <SelectContent className="bg-[var(--color-bg-select-content)] text-[var(--color-text-primary)]">
                 <SelectItem value="SHOP">SHOP</SelectItem>
                 <SelectItem value="CEO">CEO</SelectItem>
+                <SelectItem value="READ">READ</SelectItem>
               </SelectContent>
             </Select>
           </div>
