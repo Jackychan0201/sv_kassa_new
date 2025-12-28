@@ -10,7 +10,7 @@ import { Throttle } from '@nestjs/throttler';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('login')
   @Throttle({ default: { limit: 10, ttl: 1 * 60 * 1000 } })
@@ -20,12 +20,10 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    // Prevent caching
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    // Clear any existing authentication cookie first
     const isProduction = process.env.NODE_ENV === 'production';
     const baseOptions = {
       httpOnly: true,
@@ -42,10 +40,8 @@ export class AuthController {
     }
     res.clearCookie('Authentication', baseOptions);
 
-    // Now perform login
     const { token, expiresInMs } = await this.authService.login(dto.email, dto.password);
 
-    // Set new cookie
     res.cookie('Authentication', token, {
       ...baseOptions,
       maxAge: expiresInMs,
@@ -68,8 +64,7 @@ export class AuthController {
     res.setHeader('Expires', '0');
 
     const isProduction = process.env.NODE_ENV === 'production';
-    
-    // Clear cookie with all possible domain configurations
+
     const baseOptions = {
       httpOnly: true,
       secure: true,
@@ -77,15 +72,13 @@ export class AuthController {
       path: '/',
     };
 
-    // Clear with domain if in production
     if (isProduction && process.env.NEXT_PUBLIC_COOKIE_DOMAIN) {
       res.clearCookie('Authentication', {
         ...baseOptions,
         domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN
       });
     }
-    
-    // Always clear without domain (for localhost and fallback)
+
     res.clearCookie('Authentication', baseOptions);
 
     return { message: 'Logged out successfully' };
