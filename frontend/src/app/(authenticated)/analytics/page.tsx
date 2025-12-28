@@ -174,7 +174,22 @@ export default function AnalyticsPage() {
         filteredRecords = actualRecords.filter((r) => r.shopId === shopId)
       }
 
-      const daysToPredict = Math.max(0, toDate.getDate() - today.getDate())
+      let lastRecordDate = fromDate;
+      if (filteredRecords.length > 0) {
+        // Assume records are not guaranteed sorted by date from API, so find the max
+        const maxDateStr = filteredRecords.reduce((max, r) => {
+          const [d, m, y] = r.recordDate.split('.').map(Number);
+          const date = new Date(y, m - 1, d);
+          return date > max ? date : max;
+        }, fromDate);
+        lastRecordDate = maxDateStr;
+      }
+
+      // Calculate how many days from the last record until the end of the month
+      // We want to fill the chart until `toDate`
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysToPredict = Math.ceil((toDate.getTime() - lastRecordDate.getTime()) / msPerDay);
+
       const predictions = daysToPredict > 0
         ? await getProphetForecast(shopId === "current" ? undefined : shopId, daysToPredict, metric)
         : null
