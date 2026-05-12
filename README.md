@@ -1,4 +1,4 @@
-# SV KASSA - final internship project
+# SV KASSA
 ## A project for analysing shops' storages efficiency
 
 ## Project description
